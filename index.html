@@ -412,12 +412,12 @@ Check My Location button code leaflet
 					<span class="anchor">᠎⠀ ⠀᠎⠀ ⠀</span>
 					
 					<ul class="items">
-						<!-- <b><li>Fire Data</li></b>
+						<b><li>Fire Data</li></b>
 						<li><input style="margin-left: 15px;" type="checkbox" class="active-fire" checked />  Inactive Fire </li>
 						<b><li>Smoke Data</li></b>
 						<li><input style="margin-left: 15px;" type="checkbox" class="one-hour-smoke" checked />  1 Hour Forecast </li>
 						<li><input style="margin-left: 15px;" type="checkbox" class="two-hour-smoke" checked />  2 Hour Forecast </li>
-						<li><input style="margin-left: 15px;" type="checkbox" class="three-hour-smoke" checked />  3 Hour Forecast </li> -->
+						<li><input style="margin-left: 15px;" type="checkbox" class="three-hour-smoke" checked />  3 Hour Forecast </li>
 						<b><li>Air Data</li></b>
 						<li><input style="margin-left: 15px;" type="checkbox" class="purple-air" checked />  PurpleAir Data</li>
 						<!-- Microsoft seems to have pulled the rug on their air sensors -->
@@ -451,14 +451,14 @@ Check My Location button code leaflet
 					</ul>
 				</div>
 
-				<!-- <div id="filter-menu2" class="dropdown-check-list2" tabindex="100" style="position:relative; margin-top: 17px; margin-left: 15px;">
+				<div id="filter-menu2" class="dropdown-check-list2" tabindex="100" style="position:relative; margin-top: 17px; margin-left: 15px;">
 					<a onclick="stats()" href="#">
 					<img src="https://smartcity.tacc.utexas.edu/FireIncident/assets/images/stats.png" width="25px" height="25px"  xml:space="preserve"> </img>
 				</a>
 
-				</div> -->
+				</div>
 	
-				<!-- <div class="dropdown" >
+				<div class="dropdown" >
 
 				<div id="filter-menu1" class="dropdown-check-list1" tabindex="100">
 					<span id="CurrentSelectedDate" class="anchor"  type="button" data-toggle="dropdown" style="user-select: none">⠀ ⠀᠎⠀ ⠀Today</span>
@@ -469,9 +469,43 @@ Check My Location button code leaflet
 						<li><a onclick="get3Days()" href="#" class="option">Past 3 Days</a></li>
 						<li><a onclick="getCustom()" href="#" class="option">Custom</a></li>
 					  </ul>
-				</div>
-				</div> -->
+					<!--
+					<ul class="items">
 
+					<div class="select-bar">
+					<div class="bar bar-grey" style="color: black; display: block;">
+						<div class="option1">Today</div>
+						<div class="option1">Yesterday</div>
+						<div class="option1">Past 3 Days</div>
+						<div class="option1">Custom</div>
+					</div>
+					<div class="bar-outer">
+						<div class="bar bar-purple" style="color: black; display: block;">
+							<div class="option1">Today</div>
+							<div class="option1">Yesterday</div>
+							<div class="option1">Past 3 Days</div>
+							<div class="option1">Custom</div>
+						</div>
+					</div>
+				</div>
+	
+
+					</ul>
+					-->
+				</div>
+				</div>
+
+				<!--
+				<div class="select-bar" width="10%" style="margin-left:100px; width: 300px;">
+					<div class="bar bar-grey" style="width: 300px;">
+						<div class="option2" style="width: 300px;">Check my Location</div>
+					</div>
+					<div class="bar-outer2" style="width: 300px;">
+						<div class="bar bar-purple bar-purple2" style="width: 300px;">
+							<div class="option2" style="width: 300px;">Check my Location</div>
+						</div>
+					</div>
+				</div> -->
 			
 				<div id="filter-menu2" class="dropdown-check-list2" tabindex="100" style="position:relative; margin-top: 17px; margin-left: 15px;">
 					<a href="https://smartcity.tacc.utexas.edu/FireIncident/3D" style="text-decoration:none;">
@@ -491,6 +525,124 @@ Check My Location button code leaflet
     </div>
 </section>
 
+	<!--
+		<div id="top-container">
+			<div id="title">
+				<h2 style="margin-top:12px; margin-right: 100px;"><a href>Active Fire Incidents Map</a></h2>
+
+				<div style="clear: both;"></div>
+
+				<div class="date-bar">
+				<div class="select-bar">
+					<div class="bar bar-grey">
+						<div class="option">Today</div>
+						<div class="option">Yesterday</div>
+						<div class="option">Past 3 Days</div>
+						<div class="option">Custom</div>
+					</div>
+					<div class="bar-outer">
+						<div class="bar bar-purple">
+							<div class="option">Today</div>
+							<div class="option">Yesterday</div>
+							<div class="option">Past 3 Days</div>
+							<div class="option">Custom</div>
+						</div>
+					</div>
+				</div>
+	
+				<div class="date-picker">
+					<label for="start">Start date:</label>
+					<input type="date" id="start" name="trip-start" min="2022-01-31">
+				</div>
+	
+
+	
+				<div id="filter-menu" class="dropdown-check-list" tabindex="100">
+					<span class="anchor">Data Filter</span>
+					<ul class="items">
+						<li>- Fire Data -</li>
+						<li><input type="checkbox" class="active-fire" checked />Inactive Fire </li>
+						<li>- Smoke Data -</li>
+						<li><input type="checkbox" class="one-hour-smoke" checked />1 Hour Forecast </li>
+						<li><input type="checkbox" class="two-hour-smoke" checked />2 Hour Forecast </li>
+						<li><input type="checkbox" class="three-hour-smoke" checked />3 Hour Forecast </li>
+						<li>- Air Data -</li>
+						<li><input type="checkbox" class="purple-air" checked />PurpleAir Data</li>
+						<li><input type="checkbox" class="microsoft-air" checked />MSR Air Quality Sensors </li>
+						<li>- Shapefile -</li>
+						<li><input type="radio" id="fire-risk-radio" name="shapefile-radio" value="fire-risk-radio"
+								checked />
+							<label for="fire-risk-radio">Fire Vulnerability</label>
+						</li>
+						<li><input type="radio" id="afd-radio" name="shapefile-radio" value="afd-radio" />
+							<label for="afd-radio">AFD Converage</label>
+						</li>
+						<li><input type="radio" id="hvi-radio" name="shapefile-radio" value="hvi-radio" />
+							<label for="hvi-radio">HVI Map</label>
+						</li>
+						<li><input type="radio" id="no-shapefile" name="shapefile-radio" value="none-radio" />
+							<label for="none-radio">None</label>
+						</li>
+					</ul>
+				</div>
+	
+				<div class="select-bar" width="10%" style="margin-left:100px; width: 300px;">
+					<div class="bar bar-grey" style="width: 300px;">
+						<div class="option2" style="width: 300px;">Check my Location</div>
+					</div>
+					<div class="bar-outer2" style="width: 300px;">
+						<div class="bar bar-purple bar-purple2" style="width: 300px;">
+							<div class="option2" style="width: 300px;">Check my Location</div>
+						</div>
+					</div>
+				</div>
+	
+			</div>
+			
+
+			</div>
+			
+			
+			<div id="search-input-container">
+				<input
+					id="search-input"
+					name="search"
+					type="text"
+					spellcheck="false"
+					placeholder="Search by address"
+				/>
+				<div id="clear" tabindex="0"><img src="assets/images/times-dark.svg" /></div>
+			</div>
+
+			<div id="search-results-container">
+				<div id="search-results-counter"></div>
+				<ul id="search-results-list"></ul>
+				<div id="selected-container">
+					<table id="info-table">
+						<tr id="affiliated-row">
+							<td id="affiliated-label">Affiliated with:</td>
+							<td id="affiliated-value"></td>
+						</tr>
+						<tr id="owned-row">
+							<td id="owned-label">Units owned:</td>
+							<td id="owned-value"></td>
+						</tr>
+						<tr id="taxpayer-row">
+							<td id="taxpayer-label">Property taxpayer:</td>
+							<td id="taxpayer-value"></td>
+						</tr>
+					</table>
+					<button id="download-button" class="button-hover"></button>
+					<div id="bottom-links">
+						<p id="data-info-link" class="property-details-link" tabindex="0">See an issues with our data?</p>
+						<p id="additional-details-link" class="property-details-link" tabindex="0">Additional property details</p>
+						<div style="clear: both;"></div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+-->
 		
 			
 			<div class="legend-wrapper">
@@ -588,7 +740,7 @@ Check My Location button code leaflet
 
 
 		
-			<!-- <div class="legend-wrapper">
+			<div class="legend-wrapper">
 				<div class="fire-risk-legend">
 					<div style="background-color: white;">
 						<span id="fireRiskType">Fire Risk: </span>
@@ -603,7 +755,7 @@ Check My Location button code leaflet
 						<span>Normal</span>
 					</div>
 				</div>
-			</div>			 -->
+			</div>			
 			<div class="legend-wrapper">
 				<div class="afd-legend">
 					<div style="background-color: white;">
