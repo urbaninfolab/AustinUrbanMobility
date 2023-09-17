@@ -1576,7 +1576,7 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
         });
     }
 
-    var tranMarkers = [];
+    let tranMarkers = [];
 
     function buildTranMap() {
 
@@ -1585,62 +1585,56 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
             tranMarkers[i].remove();
         }
 
-        var transit = document.querySelector(".transit").checked;
+        let transit = document.querySelector(".transit").checked;
 
         console.log("Urban mobility button clicked");
 
         // mobility JSON data
-        if (transit) {
-            fetch('https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json')
-              .then(response => {
-                // Check if the response is ok (status code in the range 200-299)
+    if (transit) {
+        fetch('https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json')
+            .then(response => {
                 if (!response.ok) {
-                  throw new Error('Network response was not ok');
+                    throw new Error('Network response was not ok');
                 }
-                return response.json(); // Parse the response body as JSON
-              })
-              .then(data => {
-                // Use the JSON data
-                var transit_json = data;  // Storing in a variable
-                console.log(data);
-              })
-              .catch(error => {
-                // Handle any errors
+                return response.json(); 
+            })
+            .then(transit_json => {
+                console.log(transit_json);
+                
+                const iconLink = "assets/images/bus_icon.png";
+                console.log("Display Transit");
+                
+                transit_json["entity"].forEach((entity, index) => {
+                    const vehicle = entity["vehicle"];
+                    if (!vehicle || !vehicle.hasOwnProperty("trip") || !vehicle.hasOwnProperty("position")) {
+                        console.log(index);
+                        return;
+                    }
+                    const marker = L.marker([vehicle["position"]["latitude"], vehicle["position"]["longitude"]]).addTo(map);
+                    marker.setIcon(L.icon({
+                        iconUrl: iconLink,
+                        iconSize: [24, 32],
+                        iconAnchor: [12, 32],
+                        popupAnchor: [0, -30]
+                    }));
+                    
+                    const route_id = vehicle["trip"]["routeId"];
+                    const vehicle_id = entity["id"];
+                    const speed = vehicle["position"]["speed"];
+                    marker.bindPopup(`Vehicle ID: ${vehicle_id}, Route: ${route_id}, Speed: ${speed} m/s`);
+
+                    // store marker in array to be deleted later
+                    tranMarkers.push(marker);
+                });
+            })
+            .catch(error => {
                 console.log('Error:', error);
-              });
-            // jsdata = '{"header":{"gtfsRealtimeVersion":"2.0","incrementality":"FULL_DATASET","timestamp":"1694631061"},"entity":[{"id":"2551","vehicle":{"trip":{"tripId":"2732178_6309","startDate":"20230913","routeId":"335"},"position":{"latitude":30.30258,"longitude":-97.7004,"bearing":116.31392,"speed":0},"currentStopSequence":1,"currentStatus":"STOPPED_AT","timestamp":"1694631060","stopId":"5926","vehicle":{"id":"2551","label":"2551"}}},{"id":"2306","vehicle":{"trip":{"tripId":"2731209_5257","startDate":"20230913","routeId":"323"},"position":{"latitude":30.340689,"longitude":-97.6933,"bearing":52.423656,"speed":9.074911},"currentStopSequence":9,"currentStatus":"IN_TRANSIT_TO","timestamp":"1694631058","stopId":"6424","vehicle":{"id":"2306","label":"2306"}}},{"id":"2304","vehicle":{"trip":{"tripId":"2732839_6769","startDate":"20230913","routeId":"345"},"position":{"latitude":30.300224,"longitude":-97.71672,"bearing":179.29863,"speed":3.4422078},"currentStopSequence":12,"currentStatus":"STOPPED_AT","timestamp":"1694631058","stopId":"2312","vehicle":{"id":"2304","label":"2304"}}},{"id":"2303","vehicle":{"trip":{"tripId":"2730805_4955","startDate":"20230913","routeId":"318"},"position":{"latitude":30.23089,"longitude":-97.79216,"bearing":27.723995,"speed":8.6278715},"currentStopSequence":40,"currentStatus":"STOPPED_AT","timestamp":"1694631059","stopId":"2216","vehicle":{"id":"2303","label":"2303"}}}]}'
-            // const transit_json = JSON.parse(jsdata);
-            var iconLink = "assets/images/bus_icon.png";
-            console.log("Display Transit");
-            let transit_json = data
-            for (var i = 0; i < transit_json["entity"].length; i++){
-                if (!transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
-                    console.log(i);
-                    continue;
-                }
-                var marker = L.marker([transit_json["entity"][i]["vehicle"]["position"]["latitude"], transit_json["entity"][i]["vehicle"]["position"]["longitude"]]).addTo(map);
-                // console.log([transit_json["entity"][i]["vehicle"]["position"]["latitude"], transit_json["entity"][i]["vehicle"]["position"]["longitude"]])
-                // Change the icon to a custom icon
-                marker.setIcon(L.icon({
-                    iconUrl: iconLink,
-                    iconSize: [24, 32],
-                    iconAnchor: [12, 32],
-                    popupAnchor: [0, -30]
-                }));
-
-                var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
-                var vehicle_id = transit_json["entity"][i]["id"]
-                var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
-                marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
-
-                // store marker in array to be deleted later
-                tranMarkers.push(marker);
-            }
-        }
+            });
+    }
         
     }
 
-    var scooterMarkers = [];
+    let scooterMarkers = [];
 
     function buildScooterMap() {
 
@@ -1649,7 +1643,7 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
             scooterMarkers[i].remove();
         }
 
-        var micromobility = document.querySelector(".micromobility").checked;
+        let micromobility = document.querySelector(".micromobility").checked;
 
         console.log("Urban mobility button clicked");
 
@@ -1663,35 +1657,35 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
                 }
                 return response.json(); // Parse the response body as JSON
               })
-              .then(data => {
-                var scooter_json = data;  // Storing in a variable
-                console.log(data);
-              })
-              .catch(error => {
-                // Handle any errors
+              .then(scooter_json => {
+                console.log(scooter_json);
+                
+                const iconLink = "assets/images/scooter_icon.png";
+                console.log("Display Scooter");
+                
+                scooter_json["data"]["bikes"].forEach((bike, index) => {
+                    const marker = L.marker([bike["lat"], bike["lon"]]).addTo(map);
+                    marker.setIcon(L.icon({
+                        iconUrl: iconLink,
+                        iconSize: [24, 32],
+                        iconAnchor: [12, 32],
+                        popupAnchor: [0, -30]
+                    }));
+                    
+                    const bike_id = bike["bike_id"];
+                    const bike_type = bike["vehicle_type_id"];
+                    marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
+
+                    // store marker in array to be deleted later
+                    scooterMarkers.push(marker);
+                });
+            })
+            .catch(error => {
                 console.log('Error:', error);
-              });
+            });
             // jsdata = '{"last_updated":1694794522,"ttl":16,"version":"2.2","data":{"bikes":[{"bike_id":"ed7592c8-0a1e-4482-a614-0dd6e1b9ac6f","vehicle_type_id":"1","lat":30.27044,"lon":-97.75432,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"f5a0b086-e400-4a67-bbdb-42fd17f857f1","vehicle_type_id":"1","lat":30.26451,"lon":-97.74535,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"2840da9d-47d9-4fba-b1f5-c2e3c5b7b647","vehicle_type_id":"1","lat":30.25376,"lon":-97.73538,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"357c78c7-4165-48b1-bbdb-8fd25c544020","vehicle_type_id":"1","lat":30.26454,"lon":-97.74416,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"a6ec8ab2-e2b9-4d41-b1dd-c50354e306fc","vehicle_type_id":"1","lat":30.28782,"lon":-97.74225,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"}]}}'
             // const scooter_json = JSON.parse(jsdata);
-            var iconLink = "assets/images/scooter_icon.png";
-            console.log("Display Scooter");
-            for (var i = 0; i < scooter_json["data"]["bikes"].length; i++){
-                var marker = L.marker([scooter_json["data"]["bikes"][i]["lat"], scooter_json["data"]["bikes"][i]["lon"]]).addTo(map);
-                // Change the icon to a custom icon
-                marker.setIcon(L.icon({
-                    iconUrl: iconLink,
-                    iconSize: [24, 32],
-                    iconAnchor: [12, 32],
-                    popupAnchor: [0, -30]
-                }));
 
-                var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
-                var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
-                marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
-
-                // store marker in array to be deleted later
-                scooterMarkers.push(marker);
-            }
         }
         
     }
