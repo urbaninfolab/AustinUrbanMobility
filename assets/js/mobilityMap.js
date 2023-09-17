@@ -1601,6 +1601,7 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
               })
               .then(data => {
                 // Use the JSON data
+                var transit_json = data;  // Storing in a variable
                 console.log(data);
               })
               .catch(error => {
@@ -1663,7 +1664,7 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
                 return response.json(); // Parse the response body as JSON
               })
               .then(data => {
-                // Use the JSON data
+                var scooter_json = data;  // Storing in a variable
                 console.log(data);
               })
               .catch(error => {
@@ -1674,7 +1675,6 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
             // const scooter_json = JSON.parse(jsdata);
             var iconLink = "assets/images/scooter_icon.png";
             console.log("Display Scooter");
-            let scooter_json = data
             for (var i = 0; i < scooter_json["data"]["bikes"].length; i++){
                 var marker = L.marker([scooter_json["data"]["bikes"][i]["lat"], scooter_json["data"]["bikes"][i]["lon"]]).addTo(map);
                 // Change the icon to a custom icon
