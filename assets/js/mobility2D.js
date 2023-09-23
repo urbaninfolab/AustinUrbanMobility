@@ -1166,7 +1166,7 @@ var scooter_markers = L.markerClusterGroup({
         url = "https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json"
         let response = await fetch(url);
         let transit_json = response.json();
-        // console.log(transit_json)
+        console.log(transit_json)
         for (let i = 0; i < transit_json["entity"].length; i++) {
             if (!transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
                 continue;
@@ -1205,7 +1205,6 @@ var scooter_markers = L.markerClusterGroup({
         url = "https://smartcity.tacc.utexas.edu/data/transportation/freebike.json"
         let response = await fetch(url);
         let scooter_json = response.json();
-        // let scooter_json = JSON.parse(jsdata);
         console.log(scooter_json)
         for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
             let y = scooter_json["data"]["bikes"][i]["lat"];
@@ -1668,76 +1667,76 @@ var scooter_markers = L.markerClusterGroup({
         });
     }
 
-    let tranMarkers = [];
 
     function buildTranMap() {
-
-        // Delete all markers
-        for (var i = 0; i < tranMarkers.length; i++) {
-            tranMarkers[i].remove();
+    // Delete all markers
+        for (let i = 0; i < transit_markers.length; i++) {
+            transit_markers[i].remove();
         }
-
+        for (let i = 0; i < transitLocations.length; i++) {
+            transitLocations[i].remove();
+        }
+        if (!document.querySelector(".transit").checked) {
+            return
+        }
         let transit = document.querySelector(".transit").checked;
-
-        console.log("Urban mobility button clicked");
-
         // mobility JSON data
-    if (transit) {
-        fetch('https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json(); 
-            })
-            .then(transit_json => {
-                console.log(transit_json);
-                
-                const iconLink = "assets/images/bus_icon.png";
-                console.log("Display Transit");
-                
-                transit_json["entity"].forEach((entity, index) => {
-                    const vehicle = entity["vehicle"];
-                    if (!vehicle || !vehicle.hasOwnProperty("trip") || !vehicle.hasOwnProperty("position")) {
-                        console.log(index);
-                        return;
+        if (transit) {
+            fetch('https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                    const marker = L.marker([vehicle["position"]["latitude"], vehicle["position"]["longitude"]]).addTo(map);
-                    marker.setIcon(L.icon({
-                        iconUrl: iconLink,
-                        iconSize: [24, 32],
-                        iconAnchor: [12, 32],
-                        popupAnchor: [0, -30]
-                    }));
+                    return response.json(); 
+                })
+                .then(transit_json => {
+                    console.log(transit_json);
                     
-                    const route_id = vehicle["trip"]["routeId"];
-                    const vehicle_id = entity["id"];
-                    const speed = vehicle["position"]["speed"];
-                    marker.bindPopup(`Vehicle ID: ${vehicle_id}, Route: ${route_id}, Speed: ${speed} m/s`);
-
-                    // store marker in array to be deleted later
-                    tranMarkers.push(marker);
+                    for (let i = 0; i < transit_json["entity"].length; i++) {
+                        if (!transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
+                            continue;
+                        }
+                        let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
+                        let x = transit_json["entity"][i]["vehicle"]["position"]["longitude"];
+                        let transit_marker = new L.marker([y,x]);
+                        let iconLink = "assets/images/bus_icon.png";
+                        transit_marker.setIcon(L.icon({
+                            iconUrl: iconLink,
+                            iconSize: [24, 32],
+                            iconAnchor: [12, 32],
+                            popupAnchor: [0, -30]
+                        }));
+                        var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
+                        var vehicle_id = transit_json["entity"][i]["id"]
+                        var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
+                        transit_marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
+            
+                        transit_markers.addLayer(transit_marker)
+                        transitLocations.addLayer(transit_marker)
+                    }
+                })
+                .catch(error => {
+                    console.log('Error:', error);
                 });
-            })
-            .catch(error => {
-                console.log('Error:', error);
-            });
-    }
+        }
         
     }
 
-    let scooterMarkers = [];
 
     function buildScooterMap() {
 
         // Delete all markers
-        for (var i = 0; i < scooterMarkers.length; i++) {
-            scooterMarkers[i].remove();
+        for (let i = 0; i < scooter_markers.length; i++) {
+            scooter_markers[i].remove();
+        }
+        for (let i = 0; i < scooterLocations.length; i++) {
+            scooterLocations[i].remove();
+        }
+        if (!document.querySelector(".micromobility").checked) {
+            return
         }
 
         let micromobility = document.querySelector(".micromobility").checked;
-
-        console.log("Urban mobility button clicked");
 
         // mobility JSON data
         if (micromobility) {
@@ -1752,25 +1751,24 @@ var scooter_markers = L.markerClusterGroup({
               .then(scooter_json => {
                 console.log(scooter_json);
                 
-                const iconLink = "assets/images/scooter_icon.png";
-                console.log("Display Scooter");
-                
-                scooter_json["data"]["bikes"].forEach((bike, index) => {
-                    const marker = L.marker([bike["lat"], bike["lon"]]).addTo(map);
-                    marker.setIcon(L.icon({
+                for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
+                    let y = scooter_json["data"]["bikes"][i]["lat"];
+                    let x = scooter_json["data"]["bikes"][i]["lon"];
+                    let scooter_marker = new L.marker([y,x]);
+                    let iconLink = "assets/images/scooter_icon.png";
+                    scooter_marker.setIcon(L.icon({
                         iconUrl: iconLink,
                         iconSize: [24, 32],
                         iconAnchor: [12, 32],
                         popupAnchor: [0, -30]
                     }));
-                    
-                    const bike_id = bike["bike_id"];
-                    const bike_type = bike["vehicle_type_id"];
-                    marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
-
-                    // store marker in array to be deleted later
-                    scooterMarkers.push(marker);
-                });
+                    var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
+                    var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
+                    scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
+        
+                    scooter_markers.addLayer(scooter_marker)
+                    scooterLocations.addLayer(scooter_marker)
+                }
             })
             .catch(error => {
                 console.log('Error:', error);
@@ -1809,7 +1807,7 @@ var scooter_markers = L.markerClusterGroup({
             // buildTranMap();
             console.log("transit click")
             map.removeLayer(transit_markers)
-            mapTransitData(map);
+            buildTranMap();
             if (document.querySelector(".transit").checked) {
                 map.addLayer(transit_markers)
             }   
@@ -1819,7 +1817,7 @@ var scooter_markers = L.markerClusterGroup({
             // buildScooterMap();
             console.log("micromobility click")
             map.removeLayer(scooter_markers)
-            mapScooterData(map);
+            buildScooterMap();
             if (document.querySelector(".micromobility").checked) {
                 map.addLayer(scooter_markers)
             }   
