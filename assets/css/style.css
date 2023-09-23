@@ -544,3 +544,18 @@ h5 {
 		text-align: left;
 	}
 }
+
+/* Cluster Marker*/
+.marker-cluster-black {
+	background-color: rgba(169, 169, 169, 0.6);
+	}
+.marker-cluster-black div {
+	background-color: rgba(105, 105, 105, 0.6);
+	}
+
+.marker-cluster-darkgreen {
+	background-color: rgba(4, 133, 85, 0.6);
+	}
+.marker-cluster-darkgreen div {
+	background-color: rgba(5, 89, 52, 0.6);
+	}

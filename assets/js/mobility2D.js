@@ -8,13 +8,14 @@ var activeFires = new L.FeatureGroup();
 var inactiveFires = new L.FeatureGroup();
 var purpleAirMonitors = new L.FeatureGroup();
 var microsoftAirMonitors = new L.FeatureGroup();
+let transitLocations = new L.FeatureGroup();
+let scooterLocations = new L.FeatureGroup();
 var currentShapefile = null;
 var markers = L.markerClusterGroup({
     showCoverageOnHover: false,
     //zoomToBoundsOnClick: false,
     iconCreateFunction: function(cluster) {
         var childCount = cluster.getChildCount();
-
         var markers = cluster.getAllChildMarkers();
         var sum = 0;
         for (var i = 0; i < markers.length; i++) {
@@ -23,19 +24,39 @@ var markers = L.markerClusterGroup({
         }
         var avg = sum / markers.length;
 
-var c = ' marker-cluster-';
-if (avg < 10) {
-    c += 'small';
-} else if (avg < 100) {
-    c += 'medium';
-} else {
-    c += 'large';
-}
+    var c = ' marker-cluster-';
+    if (avg < 10) {
+        c += 'small';
+    } else if (avg < 100) {
+        c += 'medium';
+    } else {
+        c += 'large';
+    }
 
-return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+    return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+        }
+});
+
+var transit_markers = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    //zoomToBoundsOnClick: false,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getChildCount();
+        var markers = cluster.getAllChildMarkers();
+        return new L.DivIcon({ html: '<div><span><b>' + childCount + '</b></span></div>', className: 'marker-cluster marker-cluster-black', iconSize: new L.Point(40, 40) });
     }
 });
-    
+
+var scooter_markers = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    //zoomToBoundsOnClick: false,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getChildCount();
+        var markers = cluster.getAllChildMarkers();
+        return new L.DivIcon({ html: '<div><span><b>' + childCount + '</b></span></div>', className: 'marker-cluster marker-cluster-darkgreen', iconSize: new L.Point(40, 40) });
+    }
+});
+
     //Input: map instance and an array of string
     async function mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag) {
         
@@ -1126,15 +1147,86 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
                 //     // If it doesn't, open it
                 //     circleMarker.openPopup();
                 // }
-
             });
-
         }
-
-
-
-
     }
+
+
+    async function mapTransitData(map) {
+        // Delete all markers
+        for (let i = 0; i < transit_markers.length; i++) {
+            transit_markers[i].remove();
+        }
+        for (let i = 0; i < transitLocations.length; i++) {
+            transitLocations[i].remove();
+        }
+        if (!document.querySelector(".transit").checked) {
+            return
+        }
+        url = "https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json"
+        let response = await fatch(url);
+        let transit_json = response.json();
+        // console.log(transit_json)
+        for (let i = 0; i < transit_json["entity"].length; i++) {
+            if (!transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
+                continue;
+            }
+            let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
+            let x = transit_json["entity"][i]["vehicle"]["position"]["longitude"];
+            let transit_marker = new L.marker([y,x]);
+            let iconLink = "assets/images/bus_icon.png";
+            transit_marker.setIcon(L.icon({
+                iconUrl: iconLink,
+                iconSize: [24, 32],
+                iconAnchor: [12, 32],
+                popupAnchor: [0, -30]
+            }));
+            var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
+            var vehicle_id = transit_json["entity"][i]["id"]
+            var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
+            transit_marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
+
+            transit_markers.addLayer(transit_marker)
+            transitLocations.addLayer(transit_marker)
+        }
+    }
+
+    async function mapScooterData(map) {
+        // Delete all markers
+        for (let i = 0; i < scooter_markers.length; i++) {
+            scooter_markers[i].remove();
+        }
+        for (let i = 0; i < scooterLocations.length; i++) {
+            scooterLocations[i].remove();
+        }
+        if (!document.querySelector(".micromobility").checked) {
+            return
+        }
+        url = "https://smartcity.tacc.utexas.edu/data/transportation/freebike.json"
+        let response = await fatch(url);
+        let scooter_json = response.json();
+        // let scooter_json = JSON.parse(jsdata);
+        console.log(scooter_json)
+        for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
+            let y = scooter_json["data"]["bikes"][i]["lat"];
+            let x = scooter_json["data"]["bikes"][i]["lon"];
+            let scooter_marker = new L.marker([y,x]);
+            let iconLink = "assets/images/scooter_icon.png";
+            scooter_marker.setIcon(L.icon({
+                iconUrl: iconLink,
+                iconSize: [24, 32],
+                iconAnchor: [12, 32],
+                popupAnchor: [0, -30]
+            }));
+            var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
+            var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
+            scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
+
+            scooter_markers.addLayer(scooter_marker)
+            scooterLocations.addLayer(scooter_marker)
+        }
+    }
+
 
     function addMore() {
         console.log("hey")
@@ -1683,9 +1775,6 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
             .catch(error => {
                 console.log('Error:', error);
             });
-            // jsdata = '{"last_updated":1694794522,"ttl":16,"version":"2.2","data":{"bikes":[{"bike_id":"ed7592c8-0a1e-4482-a614-0dd6e1b9ac6f","vehicle_type_id":"1","lat":30.27044,"lon":-97.75432,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"f5a0b086-e400-4a67-bbdb-42fd17f857f1","vehicle_type_id":"1","lat":30.26451,"lon":-97.74535,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"2840da9d-47d9-4fba-b1f5-c2e3c5b7b647","vehicle_type_id":"1","lat":30.25376,"lon":-97.73538,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"357c78c7-4165-48b1-bbdb-8fd25c544020","vehicle_type_id":"1","lat":30.26454,"lon":-97.74416,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"},{"bike_id":"a6ec8ab2-e2b9-4d41-b1dd-c50354e306fc","vehicle_type_id":"1","lat":30.28782,"lon":-97.74225,"is_reserved":false,"is_disabled":false,"pricing_plan_id":"a582358c-0fda-4335-8089-2ac014b38b8b"}]}}'
-            // const scooter_json = JSON.parse(jsdata);
-
         }
         
     }
@@ -1717,11 +1806,23 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
         });
 
         document.querySelector(".transit").addEventListener('click', function () {
-            buildTranMap();
+            // buildTranMap();
+            console.log("transit click")
+            map.removeLayer(transit_markers)
+            mapTransitData(map);
+            if (document.querySelector(".transit").checked) {
+                map.addLayer(transit_markers)
+            }   
         });
 
         document.querySelector(".micromobility").addEventListener('click', function () {
-            buildScooterMap();
+            // buildScooterMap();
+            console.log("micromobility click")
+            map.removeLayer(scooter_markers)
+            mapScooterData(map);
+            if (document.querySelector(".micromobility").checked) {
+                map.addLayer(scooter_markers)
+            }   
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
@@ -1866,8 +1967,8 @@ return new L.DivIcon({ html: '<div><span><b>' + Math.round(avg) + '</b></span></
     new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 
     let inactive_flag = true;
-    let purple_air_diaplay_flag = true;
-    let microsoft_air_display_flag = true;
+    let purple_air_diaplay_flag = false;
+    let microsoft_air_display_flag = false;
 
     addMapLayer(map);
 
