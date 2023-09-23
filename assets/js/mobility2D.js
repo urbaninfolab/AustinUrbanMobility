@@ -1164,7 +1164,7 @@ var scooter_markers = L.markerClusterGroup({
             return
         }
         url = "https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json"
-        let response = await fatch(url);
+        let response = await fetch(url);
         let transit_json = response.json();
         // console.log(transit_json)
         for (let i = 0; i < transit_json["entity"].length; i++) {
@@ -1203,7 +1203,7 @@ var scooter_markers = L.markerClusterGroup({
             return
         }
         url = "https://smartcity.tacc.utexas.edu/data/transportation/freebike.json"
-        let response = await fatch(url);
+        let response = await fetch(url);
         let scooter_json = response.json();
         // let scooter_json = JSON.parse(jsdata);
         console.log(scooter_json)
