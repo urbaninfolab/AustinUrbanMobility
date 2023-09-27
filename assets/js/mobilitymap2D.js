@@ -1964,7 +1964,7 @@ var scooter_markers = L.markerClusterGroup({
 
     new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 
-    let inactive_flag = true;
+    let inactive_flag = false;
     let purple_air_diaplay_flag = false;
     let microsoft_air_display_flag = false;
 
@@ -1976,7 +1976,7 @@ var scooter_markers = L.markerClusterGroup({
     var today = new Date();
     var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + today.getDate()).slice(-2);
     dateArray.push(date);
-    let shapefile_display_flag = "fire-risk-radio";
+    let shapefile_display_flag = 'none-radio';
     mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
     addShapefileRadioListener(map);
     buildSelectBar(map);
