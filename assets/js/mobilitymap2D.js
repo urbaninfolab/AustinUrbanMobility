@@ -57,6 +57,31 @@ var scooter_markers = L.markerClusterGroup({
     }
 });
 
+function new_transit_cluster_layer() {
+    let cluster_layer = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        //zoomToBoundsOnClick: false,
+        iconCreateFunction: function(cluster) {
+            var childCount = cluster.getChildCount();
+            var markers = cluster.getAllChildMarkers();
+            return new L.DivIcon({ html: '<div><span><b>' + childCount + '</b></span></div>', className: 'marker-cluster marker-cluster-black', iconSize: new L.Point(40, 40) });
+        }
+    });
+    return cluster_layer
+};
+function new_scooter_cluster_layer() {
+    let cluster_layer = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        //zoomToBoundsOnClick: false,
+        iconCreateFunction: function(cluster) {
+            var childCount = cluster.getChildCount();
+            var markers = cluster.getAllChildMarkers();
+            return new L.DivIcon({ html: '<div><span><b>' + childCount + '</b></span></div>', className: 'marker-cluster marker-cluster-darkgreen', iconSize: new L.Point(40, 40) });
+        }
+    });
+    return cluster_layer
+};
+
     //Input: map instance and an array of string
     async function mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag) {
         
@@ -1670,9 +1695,10 @@ var scooter_markers = L.markerClusterGroup({
 
     function buildTranMap() {
     // Delete all markers
-        for (let i = 0; i < transit_markers.length; i++) {
-            transit_markers[i].remove();
-        }
+        // for (let i = 0; i < child_markers.length; i++) {
+            // transit_markers[i].remove();
+        //     transit_markers.removeLayer(child_markers[i]);
+        // }
         for (let i = 0; i < transitLocations.length; i++) {
             transitLocations[i].remove();
         }
@@ -1682,6 +1708,7 @@ var scooter_markers = L.markerClusterGroup({
         let transit = document.querySelector(".transit").checked;
         // mobility JSON data
         if (transit) {
+            transit_markers = new_transit_cluster_layer();
             fetch('https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json')
                 .then(response => {
                     if (!response.ok) {
@@ -1718,6 +1745,7 @@ var scooter_markers = L.markerClusterGroup({
                 .catch(error => {
                     console.log('Error:', error);
                 });
+            map.addLayer(transit_markers)
         }
         
     }
@@ -1726,9 +1754,9 @@ var scooter_markers = L.markerClusterGroup({
     function buildScooterMap() {
 
         // Delete all markers
-        for (let i = 0; i < scooter_markers.length; i++) {
-            scooter_markers[i].remove();
-        }
+        // for (let i = 0; i < scooter_markers.length; i++) {
+        //     scooter_markers[i].remove();
+        // }
         for (let i = 0; i < scooterLocations.length; i++) {
             scooterLocations[i].remove();
         }
@@ -1740,6 +1768,7 @@ var scooter_markers = L.markerClusterGroup({
 
         // mobility JSON data
         if (micromobility) {
+            scooter_markers = new_scooter_cluster_layer();
             fetch('https://smartcity.tacc.utexas.edu/data/transportation/freebike.json')
               .then(response => {
                 // Check if the response is ok (status code in the range 200-299)
@@ -1773,6 +1802,7 @@ var scooter_markers = L.markerClusterGroup({
             .catch(error => {
                 console.log('Error:', error);
             });
+            map.addLayer(scooter_markers)
         }
         
     }
@@ -1808,9 +1838,6 @@ var scooter_markers = L.markerClusterGroup({
             console.log("transit click")
             map.removeLayer(transit_markers)
             buildTranMap();
-            if (document.querySelector(".transit").checked) {
-                map.addLayer(transit_markers)
-            }   
         });
 
         document.querySelector(".micromobility").addEventListener('click', function () {
@@ -1818,9 +1845,6 @@ var scooter_markers = L.markerClusterGroup({
             console.log("micromobility click")
             map.removeLayer(scooter_markers)
             buildScooterMap();
-            if (document.querySelector(".micromobility").checked) {
-                map.addLayer(scooter_markers)
-            }   
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
