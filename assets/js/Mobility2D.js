@@ -1694,11 +1694,6 @@ function new_scooter_cluster_layer() {
 
 
     function buildTranMap() {
-    // Delete all markers
-        // for (let i = 0; i < child_markers.length; i++) {
-            // transit_markers[i].remove();
-        //     transit_markers.removeLayer(child_markers[i]);
-        // }
         for (let i = 0; i < transitLocations.length; i++) {
             transitLocations[i].remove();
         }
@@ -1752,11 +1747,6 @@ function new_scooter_cluster_layer() {
 
 
     function buildScooterMap() {
-
-        // Delete all markers
-        // for (let i = 0; i < scooter_markers.length; i++) {
-        //     scooter_markers[i].remove();
-        // }
         for (let i = 0; i < scooterLocations.length; i++) {
             scooterLocations[i].remove();
         }
@@ -1807,6 +1797,38 @@ function new_scooter_cluster_layer() {
         
     }
 
+    let incident_markers = []
+    function buildIncidentMap() {
+        // Delete all markers
+        for (var i = 0; i < incident_markers.length; i++) {
+            incident_markers[i].remove();
+        }
+        let incident = document.querySelector(".incident").checked;
+        if (incident) {
+            console.log("Incident checked")
+            let incident_json = JSON.parse('[{"Published Date": "09/26/2023 09:27:10 PM +0000", "Issue Reported": "Crash Service", "Address": "4000-4017 S 1st St", "Latitude": 30.225932, "Longitude": -97.769825, "Status": "ACTIVE", "time": "2023-09-26 16:27:10"}, {"Published Date": "09/26/2023 10:33:20 PM +0000", "Issue Reported": "Crash Urgent", "Address": "13318-13534 N Sh 45 W Wb", "Latitude": 30.471481, "Longitude": -97.788028, "Status": "ACTIVE", "time": "2023-09-26 17:33:20"}, {"Published Date": "09/26/2023 10:54:35 PM +0000", "Issue Reported": "Crash Service", "Address": "Provines Dr / N Lamar Blvd", "Latitude": 30.376738, "Longitude": -97.689309, "Status": "ACTIVE", "time": "2023-09-26 17:54:35"}, {"Published Date": "09/26/2023 11:35:47 PM +0000", "Issue Reported": "COLLISION", "Address": "19503 Old Burnet Rd", "Latitude": 30.46461, "Longitude": -97.959907, "Status": "ACTIVE", "time": "2023-09-26 18:35:47"}, {"Published Date": "09/26/2023 11:54:22 PM +0000", "Issue Reported": "Crash Service", "Address": "COLINTON AVE / HARRIS BRANCH PKWY", "Latitude": 30.372672, "Longitude": -97.611924, "Status": "ACTIVE", "time": "2023-09-26 18:54:22"}, {"Published Date": "09/26/2023 11:54:33 PM +0000", "Issue Reported": "Crash Service", "Address": "1971-1975 S Pleasant Valley Rd", "Latitude": 30.233645, "Longitude": -97.723418, "Status": "ACTIVE", "time": "2023-09-26 18:54:33"}]')
+            console.log(incident_json)
+            for (let i = 0; i < incident_json.length; i++) {
+                let y = incident_json[i]["Latitude"];
+                let x = incident_json[i]["Longitude"];
+                let incident_marker = new L.marker([y,x]).addTo(map);
+                let iconLink = "assets/images/incident_icon.png"
+                incident_marker.setIcon(L.icon({
+                    iconUrl: iconLink,
+                    iconSize: [24, 32],
+                    iconAnchor: [12, 32],
+                    popupAnchor: [0, -30]
+                }));
+                let issue = incident_json[i]["Issue Reported"];
+                let address = incident_json[i]["Address"];
+                let pub_time = incident_json[i]["time"];
+                let status = incident_json[i]["Status"];
+                incident_marker.bindPopup(" Issue: " + issue + ", Address: " + address + ", Time: " + pub_time + ", Status: " + status);
+                incident_markers.push(incident_marker);
+            }
+        }
+    }
+
     function buildDropdownMenu(map) {
         var checkList = document.getElementById('filter-menu');
         checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
@@ -1845,6 +1867,10 @@ function new_scooter_cluster_layer() {
             console.log("micromobility click")
             map.removeLayer(scooter_markers)
             buildScooterMap();
+        });
+
+        document.querySelector(".incident").addEventListener('click', function () {
+            buildIncidentMap();
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
