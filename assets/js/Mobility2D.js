@@ -1769,7 +1769,6 @@ function new_scooter_cluster_layer() {
               })
               .then(scooter_json => {
                 console.log(scooter_json);
-                
                 for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
                     let y = scooter_json["data"]["bikes"][i]["lat"];
                     let x = scooter_json["data"]["bikes"][i]["lon"];
@@ -1794,7 +1793,6 @@ function new_scooter_cluster_layer() {
             });
             map.addLayer(scooter_markers)
         }
-        
     }
 
     let incident_markers = []
@@ -1806,26 +1804,39 @@ function new_scooter_cluster_layer() {
         let incident = document.querySelector(".incident").checked;
         if (incident) {
             console.log("Incident checked")
-            let incident_json = JSON.parse('[{"Published Date": "09/26/2023 09:27:10 PM +0000", "Issue Reported": "Crash Service", "Address": "4000-4017 S 1st St", "Latitude": 30.225932, "Longitude": -97.769825, "Status": "ACTIVE", "time": "2023-09-26 16:27:10"}, {"Published Date": "09/26/2023 10:33:20 PM +0000", "Issue Reported": "Crash Urgent", "Address": "13318-13534 N Sh 45 W Wb", "Latitude": 30.471481, "Longitude": -97.788028, "Status": "ACTIVE", "time": "2023-09-26 17:33:20"}, {"Published Date": "09/26/2023 10:54:35 PM +0000", "Issue Reported": "Crash Service", "Address": "Provines Dr / N Lamar Blvd", "Latitude": 30.376738, "Longitude": -97.689309, "Status": "ACTIVE", "time": "2023-09-26 17:54:35"}, {"Published Date": "09/26/2023 11:35:47 PM +0000", "Issue Reported": "COLLISION", "Address": "19503 Old Burnet Rd", "Latitude": 30.46461, "Longitude": -97.959907, "Status": "ACTIVE", "time": "2023-09-26 18:35:47"}, {"Published Date": "09/26/2023 11:54:22 PM +0000", "Issue Reported": "Crash Service", "Address": "COLINTON AVE / HARRIS BRANCH PKWY", "Latitude": 30.372672, "Longitude": -97.611924, "Status": "ACTIVE", "time": "2023-09-26 18:54:22"}, {"Published Date": "09/26/2023 11:54:33 PM +0000", "Issue Reported": "Crash Service", "Address": "1971-1975 S Pleasant Valley Rd", "Latitude": 30.233645, "Longitude": -97.723418, "Status": "ACTIVE", "time": "2023-09-26 18:54:33"}]')
-            console.log(incident_json)
-            for (let i = 0; i < incident_json.length; i++) {
-                let y = incident_json[i]["Latitude"];
-                let x = incident_json[i]["Longitude"];
-                let incident_marker = new L.marker([y,x]).addTo(map);
-                let iconLink = "assets/images/incident_icon.png"
-                incident_marker.setIcon(L.icon({
-                    iconUrl: iconLink,
-                    iconSize: [24, 32],
-                    iconAnchor: [12, 32],
-                    popupAnchor: [0, -30]
-                }));
-                let issue = incident_json[i]["Issue Reported"];
-                let address = incident_json[i]["Address"];
-                let pub_time = incident_json[i]["time"];
-                let status = incident_json[i]["Status"];
-                incident_marker.bindPopup(" Issue: " + issue + ", Address: " + address + ", Time: " + pub_time + ", Status: " + status);
-                incident_markers.push(incident_marker);
-            }
+            // let incident_json = JSON.parse('[{"Published Date": "09/26/2023 09:27:10 PM +0000", "Issue Reported": "Crash Service", "Address": "4000-4017 S 1st St", "Latitude": 30.225932, "Longitude": -97.769825, "Status": "ACTIVE", "time": "2023-09-26 16:27:10"}, {"Published Date": "09/26/2023 10:33:20 PM +0000", "Issue Reported": "Crash Urgent", "Address": "13318-13534 N Sh 45 W Wb", "Latitude": 30.471481, "Longitude": -97.788028, "Status": "ACTIVE", "time": "2023-09-26 17:33:20"}, {"Published Date": "09/26/2023 10:54:35 PM +0000", "Issue Reported": "Crash Service", "Address": "Provines Dr / N Lamar Blvd", "Latitude": 30.376738, "Longitude": -97.689309, "Status": "ACTIVE", "time": "2023-09-26 17:54:35"}, {"Published Date": "09/26/2023 11:35:47 PM +0000", "Issue Reported": "COLLISION", "Address": "19503 Old Burnet Rd", "Latitude": 30.46461, "Longitude": -97.959907, "Status": "ACTIVE", "time": "2023-09-26 18:35:47"}, {"Published Date": "09/26/2023 11:54:22 PM +0000", "Issue Reported": "Crash Service", "Address": "COLINTON AVE / HARRIS BRANCH PKWY", "Latitude": 30.372672, "Longitude": -97.611924, "Status": "ACTIVE", "time": "2023-09-26 18:54:22"}, {"Published Date": "09/26/2023 11:54:33 PM +0000", "Issue Reported": "Crash Service", "Address": "1971-1975 S Pleasant Valley Rd", "Latitude": 30.233645, "Longitude": -97.723418, "Status": "ACTIVE", "time": "2023-09-26 18:54:33"}]')
+            fetch('https://smartcity.tacc.utexas.edu/data/transportation/incident_active.json')
+              .then(response => {
+                // Check if the response is ok (status code in the range 200-299)
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                  }
+                  return response.json(); // Parse the response body as JSON
+              })
+              .then(incident_json => {
+                console.log(incident_json)
+                for (let i = 0; i < incident_json.length; i++) {
+                    let y = incident_json[i]["Latitude"];
+                    let x = incident_json[i]["Longitude"];
+                    let incident_marker = new L.marker([y,x]).addTo(map);
+                    let iconLink = "assets/images/incident_icon.png"
+                    incident_marker.setIcon(L.icon({
+                        iconUrl: iconLink,
+                        iconSize: [24, 32],
+                        iconAnchor: [12, 32],
+                        popupAnchor: [0, -30]
+                    }));
+                    let issue = incident_json[i]["Issue Reported"];
+                    let address = incident_json[i]["Address"];
+                    let pub_time = incident_json[i]["time"];
+                    let status = incident_json[i]["Status"];
+                    incident_marker.bindPopup(" Issue: " + issue + ", Address: " + address + ", Time: " + pub_time + ", Status: " + status);
+                    incident_markers.push(incident_marker);
+                }
+              })
+              .catch(error => {
+                console.log('Error:', error);
+              });
         }
     }
 
