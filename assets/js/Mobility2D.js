@@ -10,6 +10,7 @@ var purpleAirMonitors = new L.FeatureGroup();
 var microsoftAirMonitors = new L.FeatureGroup();
 let transitLocations = new L.FeatureGroup();
 let scooterLocations = new L.FeatureGroup();
+let incidentLocations = new L.FeatureGroup();
 var currentShapefile = null;
 var markers = L.markerClusterGroup({
     showCoverageOnHover: false,
@@ -57,6 +58,16 @@ var scooter_markers = L.markerClusterGroup({
     }
 });
 
+var archived_incident_markers = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    //zoomToBoundsOnClick: false,
+    iconCreateFunction: function(cluster) {
+        var childCount = cluster.getChildCount();
+        var markers = cluster.getAllChildMarkers();
+        return new L.DivIcon({ html: '<div><span><b>' + childCount + '</b></span></div>', className: 'marker-cluster marker-cluster-darkorange', iconSize: new L.Point(40, 40) });
+    }
+});
+
 function new_transit_cluster_layer() {
     let cluster_layer = L.markerClusterGroup({
         showCoverageOnHover: false,
@@ -77,6 +88,18 @@ function new_scooter_cluster_layer() {
             var childCount = cluster.getChildCount();
             var markers = cluster.getAllChildMarkers();
             return new L.DivIcon({ html: '<div><span><b>' + childCount + '</b></span></div>', className: 'marker-cluster marker-cluster-darkgreen', iconSize: new L.Point(40, 40) });
+        }
+    });
+    return cluster_layer
+};
+function new_archived_incident_cluster_layer() {
+    let cluster_layer = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        //zoomToBoundsOnClick: false,
+        iconCreateFunction: function(cluster) {
+            var childCount = cluster.getChildCount();
+            var markers = cluster.getAllChildMarkers();
+            return new L.DivIcon({ html: '<div><span><b>' + childCount + '</b></span></div>', className: 'marker-cluster marker-cluster-darkorange', iconSize: new L.Point(40, 40) });
         }
     });
     return cluster_layer
@@ -1796,14 +1819,14 @@ function new_scooter_cluster_layer() {
     }
 
     let incident_markers = []
-    function buildIncidentMap() {
+    function buildLiveIncidentMap() {
         // Delete all markers
         for (var i = 0; i < incident_markers.length; i++) {
             incident_markers[i].remove();
         }
-        let incident = document.querySelector(".incident").checked;
+        let incident = document.querySelector(".active_incident").checked;
         if (incident) {
-            console.log("Incident checked")
+            console.log("Active Incident checked")
             // let incident_json = JSON.parse('[{"Published Date": "09/26/2023 09:27:10 PM +0000", "Issue Reported": "Crash Service", "Address": "4000-4017 S 1st St", "Latitude": 30.225932, "Longitude": -97.769825, "Status": "ACTIVE", "time": "2023-09-26 16:27:10"}, {"Published Date": "09/26/2023 10:33:20 PM +0000", "Issue Reported": "Crash Urgent", "Address": "13318-13534 N Sh 45 W Wb", "Latitude": 30.471481, "Longitude": -97.788028, "Status": "ACTIVE", "time": "2023-09-26 17:33:20"}, {"Published Date": "09/26/2023 10:54:35 PM +0000", "Issue Reported": "Crash Service", "Address": "Provines Dr / N Lamar Blvd", "Latitude": 30.376738, "Longitude": -97.689309, "Status": "ACTIVE", "time": "2023-09-26 17:54:35"}, {"Published Date": "09/26/2023 11:35:47 PM +0000", "Issue Reported": "COLLISION", "Address": "19503 Old Burnet Rd", "Latitude": 30.46461, "Longitude": -97.959907, "Status": "ACTIVE", "time": "2023-09-26 18:35:47"}, {"Published Date": "09/26/2023 11:54:22 PM +0000", "Issue Reported": "Crash Service", "Address": "COLINTON AVE / HARRIS BRANCH PKWY", "Latitude": 30.372672, "Longitude": -97.611924, "Status": "ACTIVE", "time": "2023-09-26 18:54:22"}, {"Published Date": "09/26/2023 11:54:33 PM +0000", "Issue Reported": "Crash Service", "Address": "1971-1975 S Pleasant Valley Rd", "Latitude": 30.233645, "Longitude": -97.723418, "Status": "ACTIVE", "time": "2023-09-26 18:54:33"}]')
             fetch('https://smartcity.tacc.utexas.edu/data/transportation/incident_active.json')
               .then(response => {
@@ -1819,11 +1842,11 @@ function new_scooter_cluster_layer() {
                     let y = incident_json[i]["Latitude"];
                     let x = incident_json[i]["Longitude"];
                     let incident_marker = new L.marker([y,x]).addTo(map);
-                    let iconLink = "assets/images/incident_icon.png"
+                    let iconLink = "assets/images/active_incident_icon.png"
                     incident_marker.setIcon(L.icon({
                         iconUrl: iconLink,
-                        iconSize: [24, 32],
-                        iconAnchor: [12, 32],
+                        iconSize: [22, 32],
+                        iconAnchor: [11, 32],
                         popupAnchor: [0, -30]
                     }));
                     let issue = incident_json[i]["Issue Reported"];
@@ -1837,6 +1860,57 @@ function new_scooter_cluster_layer() {
               .catch(error => {
                 console.log('Error:', error);
               });
+        }
+    }
+
+    function buildArchivedIncidentMap() {
+        for (let i = 0; i < incidentLocations.length; i++) {
+            incidentLocations[i].remove();
+        }
+        if (!document.querySelector(".archived_incident").checked) {
+            return
+        }
+
+        let archived_incident = document.querySelector(".archived_incident").checked;
+
+        // mobility JSON data
+        if (archived_incident) {
+            archived_incident_markers = new_archived_incident_cluster_layer();
+            fetch('https://smartcity.tacc.utexas.edu/data/transportation/incident_archived.json')
+              .then(response => {
+                // Check if the response is ok (status code in the range 200-299)
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the response body as JSON
+              })
+              .then(archived_incident_json => {
+                console.log(archived_incident_json);
+                for (let i = 0; i < archived_incident_json.length; i++) {
+                    let y = archived_incident_json[i]["Latitude"];
+                    let x = archived_incident_json[i]["Longitude"];
+                    let archived_incident_marker = new L.marker([y,x]);
+                    let iconLink = "assets/images/archived_incident_icon.png"
+                    archived_incident_marker.setIcon(L.icon({
+                        iconUrl: iconLink,
+                        iconSize: [22, 32],
+                        iconAnchor: [11, 32],
+                        popupAnchor: [0, -30]
+                    }));
+                    let issue = archived_incident_json[i]["Issue Reported"];
+                    let address = archived_incident_json[i]["Address"];
+                    let pub_time = archived_incident_json[i]["time"];
+                    let status = archived_incident_json[i]["Status"];
+                    archived_incident_marker.bindPopup(" Issue: " + issue + ", Address: " + address + ", Time: " + pub_time + ", Status: " + status);
+                    
+                    archived_incident_markers.addLayer(archived_incident_marker)
+                    incidentLocations.addLayer(archived_incident_marker)
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
+            });
+            map.addLayer(archived_incident_markers)
         }
     }
 
@@ -1880,8 +1954,13 @@ function new_scooter_cluster_layer() {
             buildScooterMap();
         });
 
-        document.querySelector(".incident").addEventListener('click', function () {
-            buildIncidentMap();
+        document.querySelector(".active_incident").addEventListener('click', function () {
+            buildLiveIncidentMap();
+        });
+        document.querySelector(".archived_incident").addEventListener('click', function () {
+            // console.log("archived incident click")
+            map.removeLayer(archived_incident_markers)
+            buildArchivedIncidentMap();
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
