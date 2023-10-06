@@ -1959,6 +1959,44 @@ function new_archived_incident_cluster_layer() {
         current_incident_shapefile = shpfile;
     }
 
+    let current_traffic_layer = null;
+    function builtTrafficMap() {
+        if (current_traffic_layer != null) {
+            map.removeLayer(current_traffic_layer)
+            current_traffic_layer = null
+        }
+        if (!document.querySelector(".traffic_condition").checked) {
+            return
+        }
+        let traffic_layer = L.gridLayer.googleMutant({
+            type: "roadmap",
+            styles: [
+                { featureType: "all", stylers: [{ visibility: "off" }] },
+            ],
+        }).addTo(map);
+        traffic_layer.addGoogleLayer("TrafficLayer");
+        current_traffic_layer = traffic_layer
+    }
+
+    // let current_bike_path_layer = null;
+    // function builtBikePathMap() {
+    //     if (current_bike_path_layer != null) {
+    //         map.removeLayer(current_bike_path_layer)
+    //         current_bike_path_layer = null
+    //     }
+    //     if (!document.querySelector(".bike_path").checked) {
+    //         return
+    //     }
+    //     let bike_path_layer = L.gridLayer.googleMutant({
+    //         type: "roadmap",
+    //         styles: [
+    //             { featureType: "all", stylers: [{ visibility: "off" }] },
+    //         ],
+    //     }).addTo(map);
+    //     bike_path_layer.addGoogleLayer("BicyclingLayer");
+    //     current_bike_path_layer = bike_path_layer;
+    // }
+
     function buildDropdownMenu(map) {
         var checkList = document.getElementById('filter-menu');
         checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
@@ -2009,6 +2047,12 @@ function new_archived_incident_cluster_layer() {
         });
         document.querySelector(".choropleth_incident").addEventListener('click', function () {
             buildIncidentChoropleth();
+        });
+        document.querySelector(".traffic_condition").addEventListener('click', function () {
+            builtTrafficMap();
+        });
+        document.querySelector(".bike_path").addEventListener('click', function () {
+            builtBikePathMap();
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
@@ -2165,14 +2209,16 @@ function new_archived_incident_cluster_layer() {
     var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + today.getDate()).slice(-2);
     dateArray.push(date);
     let shapefile_display_flag = 'none-radio';
-    mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-    addShapefileRadioListener(map);
+    // mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
+    // addShapefileRadioListener(map);
     buildSelectBar(map);
     buildDropdownMenu(map);
-
-    // add clusters
-
     map._layersMaxZoom = 19;
+
+    document.querySelector('.afd-legend').style.display = 'none';
+    document.querySelector('.air-quality-legend').style.display = 'none';
+    document.querySelector('.fire-risk-legend').style.display = 'none';
+    document.querySelector('.hvi-legend').style.display = 'none';
 
 
 
@@ -2392,14 +2438,14 @@ L.control.watermark({ position: 'bottomright' }).addTo(map);
     //buildWeeklyColumnChart();
     //buildPerHourBoxChart();
 
-    fetch('../data/AverageFire.json').then(response => {
-        // Replace all instances of "NaN" with 0
-        return response.text().then(text => text.replace(/NaN/g, 0));
-        }).then(jsondata => {
+    // fetch('../data/AverageFire.json').then(response => {
+    //     // Replace all instances of "NaN" with 0
+    //     return response.text().then(text => text.replace(/NaN/g, 0));
+    //     }).then(jsondata => {
 
-        result = JSON.parse(jsondata)
-        console.log(result)
+    //     result = JSON.parse(jsondata)
+    //     console.log(result)
 
-        window.AverageFire = result;
-    });
+    //     window.AverageFire = result;
+    // });
 

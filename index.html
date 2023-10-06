@@ -94,6 +94,9 @@
 		gtag('config', 'G-LXDZCKSKZQ');
 		</script>
 
+		<!-- Leaflet.GridLayer.GoogleMutant -->
+		<script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
+
 	</head>
 
 <!--
@@ -444,8 +447,11 @@ Check My Location button code leaflet
 						<li><input style="margin-left: 15px;" type="checkbox" class="policedept"  />  Police Departments </li>
 						<li><input style="margin-left: 15px;" type="checkbox" class="hospital"  />  Hospitals </li>
 						<b><li>Urban Mobility</li></b>
-						<li><input style="margin-left: 15px;" type="checkbox" class="transit"  />  Transit </li>
-						<li><input style="margin-left: 15px;" type="checkbox" class="micromobility"  />  Micromobility </li>
+						<li><input style="margin-left: 15px;" type="checkbox" class="transit"  />  Transit Location</li>
+						<li><input style="margin-left: 15px;" type="checkbox" class="micromobility"  />  Micromobility Location </li>
+						<li style="display: none;"><input style="margin-left: 15px;" type="checkbox" class="bike_path"  />  Bike Path </li>
+						<b><li>Traffic Flow</li></b>
+						<li><input style="margin-left: 15px;" type="checkbox" class="traffic_condition"  />  Traffic Condition</li>
 						<b><li>Traffic Incident</li></b>
 						<li><input style="margin-left: 15px;" type="checkbox" class="active_incident"  />  Active Traffic Incident </li>
 						<li><input style="margin-left: 15px;" type="checkbox" class="archived_incident"  />  Archived (past 2 days) </li>
@@ -810,7 +816,10 @@ Check My Location button code leaflet
 		rel="stylesheet"
 		href="assets/css/fireMap.css"
 		/>
-		<script src="assets/js/mobility2d.js"></script>
+		<script src="assets/js/mobility_map.js"></script>
+
+		<!-- Google Map Layers -->
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg" async defer></script>
 
 		<!-- Google Cloud Firebase
 		<script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
