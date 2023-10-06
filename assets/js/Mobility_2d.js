@@ -1943,14 +1943,14 @@ function new_archived_incident_cluster_layer() {
                     <span>Land Area: ${feature.properties["ALAND"]} m&sup2 </span><BR>
                 </div>
                 <div class="stats-info">
-                    <span>Incident Count (2017-2023): ${feature.properties["incident_count_all"]} </span><BR>
-                    <span>Incident Count (2023): ${feature.properties["incident_count_23"]} </span><BR>
-                    <span>Incident Count (2022): ${feature.properties["incident_count_22"]} </span><BR>
-                    <span>Incident Count (2021): ${feature.properties["incident_count_21"]} </span><BR>
+                    <span>Incident Count (2017-2023): ${feature.properties["incident_c"]} </span><BR>
+                    <span>Incident Count (2023): ${feature.properties["incident_1"]} </span><BR>
+                    <span>Incident Count (2022): ${feature.properties["incident_2"]} </span><BR>
+                    <span>Incident Count (2021): ${feature.properties["incident_3"]} </span><BR>
                 </div>
                 `;
                 layer.bindPopup(popupContent);
-                let count = Number(feature.properties["incident_count_all"]);
+                let count = Number(feature.properties["incident_c"]);
                 layer.options.color = getColor(count)
                 layer.options.weight = 0.8;
             }
