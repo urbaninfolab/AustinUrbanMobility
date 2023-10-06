@@ -1638,7 +1638,7 @@ function new_archived_incident_cluster_layer() {
 
         console.log("POI radio button clicked");
         // display csv file from POI.csv
-        var filePath = '../data/POI.csv';
+        var filePath = './data/POI.csv';
         var result;
         fetch(filePath)
             .then(response => {
@@ -1914,6 +1914,51 @@ function new_archived_incident_cluster_layer() {
         }
     }
 
+    let current_incident_shapefile = null
+    function buildIncidentChoropleth() {
+        if (current_incident_shapefile != null){
+            map.removeLayer(current_incident_shapefile)
+            current_incident_shapefile = null
+        }
+        if (!document.querySelector(".choropleth_incident").checked) {
+            return
+        }
+        let shapefile_path = "data/incident_choropleth.zip";
+        let popupContent = ``;
+        function getColor(d) {
+            return d > 3000 ? '#800026' :
+                   d > 2000  ? '#BD0026' :
+                   d > 1000  ? '#E31A1C' :
+                   d > 500  ? '#FC4E2A' :
+                   d > 300   ? '#FD8D3C' :
+                   d > 200   ? '#FEB24C' :
+                   d > 100   ? '#FED976' :
+                              '#FFEDA0';
+        }
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                popupContent = `
+                <div class="basic-info">
+                    <span>GEOID: ${feature.properties["GEOID"]}</span><BR>
+                    <span>Land Area: ${feature.properties["ALAND"]} m&sup2 </span><BR>
+                </div>
+                <div class="stats-info">
+                    <span>Incident Count (2017-2023): ${feature.properties["incident_count_all"]} </span><BR>
+                    <span>Incident Count (2023): ${feature.properties["incident_count_23"]} </span><BR>
+                    <span>Incident Count (2022): ${feature.properties["incident_count_22"]} </span><BR>
+                    <span>Incident Count (2021): ${feature.properties["incident_count_21"]} </span><BR>
+                </div>
+                `;
+                layer.bindPopup(popupContent);
+                let count = Number(feature.properties["incident_count_all"]);
+                layer.options.color = getColor(count)
+                layer.options.weight = 0.8;
+            }
+        })
+        shpfile.addTo(map);
+        current_incident_shapefile = shpfile;
+    }
+
     function buildDropdownMenu(map) {
         var checkList = document.getElementById('filter-menu');
         checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
@@ -1961,6 +2006,9 @@ function new_archived_incident_cluster_layer() {
             // console.log("archived incident click")
             map.removeLayer(archived_incident_markers)
             buildArchivedIncidentMap();
+        });
+        document.querySelector(".choropleth_incident").addEventListener('click', function () {
+            buildIncidentChoropleth();
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
