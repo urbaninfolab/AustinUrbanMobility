@@ -1924,7 +1924,7 @@ function new_archived_incident_cluster_layer() {
             return
         }
         console.log('function called!')
-        let shapefile_path = "data/incident_choropleth.zip";
+        let shapefile_path = "./data/incident_choropleth.zip";
         let popupContent = ``;
         function getColor(d) {
             return d > 300 ? '#800026' :
@@ -1938,6 +1938,7 @@ function new_archived_incident_cluster_layer() {
         }
         let shpfile = new L.Shapefile(shapefile_path, {
             onEachFeature: function(feature,layer){
+                console.log('data read!')
                 popupContent = `
                 <div class="basic-info">
                     <span>GEOID: ${feature.properties["GEOID"]}</span><BR>
