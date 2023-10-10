@@ -1935,6 +1935,7 @@ function new_archived_incident_cluster_layer() {
                    d > 10   ? '#FED976' :
                               '#FFEDA0';
         }
+        console.log("choropleth_incident click")
         let shpfile = new L.Shapefile(shapefile_path, {
             onEachFeature: function(feature,layer){
                 popupContent = `
