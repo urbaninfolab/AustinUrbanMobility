@@ -1935,7 +1935,6 @@ function new_archived_incident_cluster_layer() {
                    d > 10   ? '#FED976' :
                               '#FFEDA0';
         }
-        console.log("choropleth_incident click")
         let shpfile = new L.Shapefile(shapefile_path, {
             onEachFeature: function(feature,layer){
                 popupContent = `
@@ -2049,6 +2048,7 @@ function new_archived_incident_cluster_layer() {
             buildArchivedIncidentMap();
         });
         document.querySelector(".choropleth_incident").addEventListener('click', function () {
+            console.log('choropleth_incident click')
             buildIncidentChoropleth();
         });
         document.querySelector(".traffic_condition").addEventListener('click', function () {
