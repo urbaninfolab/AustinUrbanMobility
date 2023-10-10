@@ -1939,8 +1939,8 @@ function new_archived_incident_cluster_layer() {
             onEachFeature: function(feature,layer){
                 popupContent = `
                 <div class="basic-info">
-                    <span>GEOID: ${feature.properties["GEOID"]}</span><BR>
-                    <span>Land Area: ${feature.properties["ALAND"]} m&sup2 </span><BR>
+                    <span>GEOID: ${feature.properties["GEOID20"]}</span><BR>
+                    <span>Land Area: ${feature.properties["ALAND20"]} m&sup2 </span><BR>
                 </div>
                 <div class="stats-info">
                     <span>Incident Count (2017-2023): ${feature.properties["incident_c"]} </span><BR>
@@ -1951,9 +1951,9 @@ function new_archived_incident_cluster_layer() {
                 `;
                 layer.bindPopup(popupContent);
                 let count = Number(feature.properties["incident_c"]);
+                console.log(count)
                 layer.options.color = getColor(count)
-                layer.options.stroke = false
-                
+                layer.options.weight = 0.8
                 layer.options.fillOpacity = 0.8
             }
         })
