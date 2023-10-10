@@ -1923,6 +1923,7 @@ function new_archived_incident_cluster_layer() {
         if (!document.querySelector(".choropleth_incident").checked) {
             return
         }
+        console.log('function called!')
         let shapefile_path = "data/incident_choropleth.zip";
         let popupContent = ``;
         function getColor(d) {
