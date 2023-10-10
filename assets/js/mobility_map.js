@@ -1926,13 +1926,13 @@ function new_archived_incident_cluster_layer() {
         let shapefile_path = "data/incident_choropleth.zip";
         let popupContent = ``;
         function getColor(d) {
-            return d > 3000 ? '#800026' :
-                   d > 2000  ? '#BD0026' :
-                   d > 1000  ? '#E31A1C' :
-                   d > 500  ? '#FC4E2A' :
-                   d > 300   ? '#FD8D3C' :
-                   d > 200   ? '#FEB24C' :
-                   d > 100   ? '#FED976' :
+            return d > 300 ? '#800026' :
+                   d > 200  ? '#BD0026' :
+                   d > 100  ? '#E31A1C' :
+                   d > 50  ? '#FC4E2A' :
+                   d > 30   ? '#FD8D3C' :
+                   d > 20   ? '#FEB24C' :
+                   d > 10   ? '#FED976' :
                               '#FFEDA0';
         }
         let shpfile = new L.Shapefile(shapefile_path, {
@@ -1952,7 +1952,9 @@ function new_archived_incident_cluster_layer() {
                 layer.bindPopup(popupContent);
                 let count = Number(feature.properties["incident_c"]);
                 layer.options.color = getColor(count)
-                layer.options.weight = 0.8;
+                layer.options.stroke = false
+                
+                layer.options.fillOpacity = 0.8
             }
         })
         shpfile.addTo(map);
@@ -2051,9 +2053,9 @@ function new_archived_incident_cluster_layer() {
         document.querySelector(".traffic_condition").addEventListener('click', function () {
             builtTrafficMap();
         });
-        document.querySelector(".bike_path").addEventListener('click', function () {
-            builtBikePathMap();
-        });
+        // document.querySelector(".bike_path").addEventListener('click', function () {
+        //     builtBikePathMap();
+        // });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
         var checkboxTwoSmoke = document.querySelector(".two-hour-smoke");
