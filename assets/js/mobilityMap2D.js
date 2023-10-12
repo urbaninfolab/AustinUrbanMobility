@@ -1960,6 +1960,57 @@ function new_archived_incident_cluster_layer() {
         current_incident_shapefile = shpfile;
     }
 
+    let current_road_incident = null
+    function buildRoadIncident() {
+        if (current_road_incident != null){
+            map.removeLayer(current_road_incident)
+            current_road_incident = null
+        }
+        if (!document.querySelector(".road_incident").checked) {
+            return
+        }
+        let shapefile_path = "data/road_incident.zip";
+        let popupContent = ``;
+        function getColor(d) {
+            return d > 1000 ? '#800026' :
+                   d > 500  ? '#BD0026' :
+                   d > 300  ? '#E31A1C' :
+                   d > 100  ? '#FC4E2A' :
+                   d > 50   ? '#FD8D3C' :
+                   d > 10   ? '#FEB24C' :
+                   d > 0   ? '#FED976' :
+                              '#FFEDA0';
+        }
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                let count = Number(feature.properties["count"]);
+                if(count >= 10) {
+                    popupContent = `
+                    <div class="basic-info">
+                        <span>ID: ${feature.properties["LINEARID"]}</span><BR>
+                        <span>Name: ${feature.properties["FULLNAME"]} </span><BR>
+                    </div>
+                    <div class="stats-info">
+                        <span>Incident Count: ${feature.properties["count"]} </span><BR>
+                    </div>
+                    `;
+                }
+                else {
+                    popupContent = `
+                    <div class="stats-info">
+                        <span>Incident Count: ${feature.properties["count"]} </span><BR>
+                    </div>
+                    `;
+                }
+                layer.bindPopup(popupContent);
+                layer.options.color = getColor(count)
+                layer.options.weight = 2
+            }
+        })
+        shpfile.addTo(map);
+        current_road_incident = shpfile;
+    }
+
     let current_traffic_layer = null;
     function builtTrafficMap() {
         if (current_traffic_layer != null) {
@@ -2049,6 +2100,10 @@ function new_archived_incident_cluster_layer() {
         document.querySelector(".choropleth_incident").addEventListener('click', function () {
             console.log('choropleth_incident click')
             buildIncidentChoropleth();
+        });
+        document.querySelector(".road_incident").addEventListener('click', function () {
+            console.log('road_incident click')
+            buildRoadIncident();
         });
         document.querySelector(".traffic_condition").addEventListener('click', function () {
             builtTrafficMap();
