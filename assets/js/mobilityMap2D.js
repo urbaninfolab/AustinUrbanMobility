@@ -1926,14 +1926,16 @@ function new_archived_incident_cluster_layer() {
         let shapefile_path = "data/incident_choropleth.zip";
         let popupContent = ``;
         function getColor(d) {
-            return d > 3000 ? '#800026' :
-                   d > 2000  ? '#BD0026' :
-                   d > 1000  ? '#E31A1C' :
-                   d > 500  ? '#FC4E2A' :
-                   d > 300   ? '#FD8D3C' :
-                   d > 200   ? '#FEB24C' :
-                   d > 100   ? '#FED976' :
-                              '#FFEDA0';
+            return d > 5000 ? '#800026' :
+                   d > 3000  ? '#BD0026' :
+                   d > 2000  ? '#E31A1C' :
+                   d > 1000  ? '#FC4E2A' :
+                   d > 500   ? '#FD8D3C' :
+                   d > 400   ? '#FEB24C' :
+                   d > 300   ? '#FED976' :
+                   d > 200   ? '#FFEDA0' :
+                   d > 100   ? '#bbdb44' :
+                              '#44ce1b';
         }
         let shpfile = new L.Shapefile(shapefile_path, {
             onEachFeature: function(feature,layer){
@@ -1972,14 +1974,16 @@ function new_archived_incident_cluster_layer() {
         let shapefile_path = "data/road_incident.zip";
         let popupContent = ``;
         function getColor(d) {
-            return d > 1000 ? '#800026' :
-                   d > 500  ? '#BD0026' :
-                   d > 300  ? '#E31A1C' :
-                   d > 100  ? '#FC4E2A' :
-                   d > 50   ? '#FD8D3C' :
-                   d > 10   ? '#FEB24C' :
-                   d > 0   ? '#FED976' :
-                              '#FFEDA0';
+            return d > 2000 ? '#800026' :
+                   d > 1000  ? '#BD0026' :
+                   d > 500  ? '#E31A1C' :
+                   d > 300  ? '#FC4E2A' :
+                   d > 200  ? '#FD8D3C' :
+                   d > 100   ? '#FEB24C' :
+                   d > 50   ? '#FED976' :
+                   d > 10   ? '#FFEDA0' :
+                   d > 0   ? '#bbdb44':
+                              '#44ce1b';
         }
         let shpfile = new L.Shapefile(shapefile_path, {
             onEachFeature: function(feature,layer){
