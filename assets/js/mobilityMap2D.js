@@ -2034,24 +2034,150 @@ function new_archived_incident_cluster_layer() {
         current_traffic_layer = traffic_layer
     }
 
-    // let current_bike_path_layer = null;
-    // function builtBikePathMap() {
-    //     if (current_bike_path_layer != null) {
-    //         map.removeLayer(current_bike_path_layer)
-    //         current_bike_path_layer = null
-    //     }
-    //     if (!document.querySelector(".bike_path").checked) {
-    //         return
-    //     }
-    //     let bike_path_layer = L.gridLayer.googleMutant({
-    //         type: "roadmap",
-    //         styles: [
-    //             { featureType: "all", stylers: [{ visibility: "off" }] },
-    //         ],
-    //     }).addTo(map);
-    //     bike_path_layer.addGoogleLayer("BicyclingLayer");
-    //     current_bike_path_layer = bike_path_layer;
-    // }
+    let current_walkscore_shapefile = null
+    function buildWalkScoreMap() {
+        if (current_walkscore_shapefile != null){
+            map.removeLayer(current_walkscore_shapefile)
+            current_walkscore_shapefile = null
+        }
+        if (!document.querySelector(".walk_score").checked) {
+            return
+        }
+        let shapefile_path = "data/walkscore_bg.zip";
+        let popupContent = ``;
+        function getColor(d) {
+            return d < 10 ? '#BD0026' :
+                   d < 20  ? '#E31A1C' :
+                   d < 30  ? '#FC4E2A' :
+                   d < 40  ? '#FD8D3C' :
+                   d < 50   ? '#FEB24C' :
+                   d < 60   ? '#F8DE7E' :
+                   d < 70   ? '#CDCA74' :
+                   d < 80   ? '#A3B56B' :
+                   d < 90   ? '#78A161' :
+                              '#4D8C57';
+        }
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                popupContent = `
+                <div class="basic-info">
+                    <span>GEOID: ${feature.properties["GEOID"]}</span><BR>
+                </div>
+                <div class="stats-info">
+                    <span>Walk Score: ${feature.properties["walkscore"]} </span><BR>
+                    <span>Description: ${feature.properties["ws_label"]} </span><BR>
+                </div>
+                `;
+                layer.bindPopup(popupContent);
+                let score = Number(feature.properties["walkscore"]);
+                if (isNaN(score)) {
+                    score = 0
+                }
+                layer.options.color = getColor(score)
+                layer.options.weight = 0.8
+                layer.options.fillOpacity = 0.65
+            }
+        })
+        shpfile.addTo(map);
+        current_walkscore_shapefile = shpfile;
+    }
+
+    let current_bikescore_shapefile = null
+    function buildBikeScoreMap() {
+        if (current_bikescore_shapefile != null){
+            map.removeLayer(current_bikescore_shapefile)
+            current_bikescore_shapefile = null
+        }
+        if (!document.querySelector(".bike_score").checked) {
+            return
+        }
+        let shapefile_path = "data/walkscore_bg.zip";
+        let popupContent = ``;
+        function getColor(d) {
+            return d < 10 ? '#BD0026' :
+                   d < 20  ? '#E31A1C' :
+                   d < 30  ? '#FC4E2A' :
+                   d < 40  ? '#FD8D3C' :
+                   d < 50   ? '#FEB24C' :
+                   d < 60   ? '#F8DE7E' :
+                   d < 70   ? '#CDCA74' :
+                   d < 80   ? '#A3B56B' :
+                   d < 90   ? '#78A161' :
+                              '#4D8C57';
+        }
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                let score = Number(feature.properties["bikescore"]);
+                if (isNaN(score) || score < 0) {
+                    score = 0
+                }
+                popupContent = `
+                <div class="basic-info">
+                    <span>GEOID: ${feature.properties["GEOID"]}</span><BR>
+                </div>
+                <div class="stats-info">
+                    <span>Bike Score: ${score} </span><BR>
+                    <span>Description: ${feature.properties["bs_label"]} </span><BR>
+                </div>
+                `;
+                layer.bindPopup(popupContent);
+                layer.options.color = getColor(score)
+                layer.options.weight = 0.8
+                layer.options.fillOpacity = 0.65
+            }
+        })
+        shpfile.addTo(map);
+        current_bikescore_shapefile = shpfile;
+    }
+
+    let current_transcore_shapefile = null
+    function buildTransitScoreMap() {
+        if (current_transcore_shapefile != null){
+            map.removeLayer(current_transcore_shapefile)
+            current_transcore_shapefile = null
+        }
+        if (!document.querySelector(".transit_score").checked) {
+            return
+        }
+        let shapefile_path = "data/walkscore_bg.zip";
+        let popupContent = ``;
+        function getColor(d) {
+            return d < 5 ? '#BD0026' :
+                   d < 10  ? '#E31A1C' :
+                   d < 15  ? '#FC4E2A' :
+                   d < 20  ? '#FD8D3C' :
+                   d < 30   ? '#FEB24C' :
+                   d < 40   ? '#F8DE7E' :
+                   d < 50   ? '#CDCA74' :
+                   d < 60   ? '#A3B56B' :
+                   d < 70   ? '#78A161' :
+                              '#4D8C57';
+        }
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                let score = Number(feature.properties["transcore"]);
+                if (isNaN(score) || score < 0) {
+                    score = 0
+                }
+                popupContent = `
+                <div class="basic-info">
+                    <span>GEOID: ${feature.properties["GEOID"]}</span><BR>
+                </div>
+                <div class="stats-info">
+                    <span>Transit Score: ${score} </span><BR>
+                    <span>Description: ${feature.properties["ts_label"]} </span><BR>
+                </div>
+                `;
+                layer.bindPopup(popupContent);
+                layer.options.color = getColor(score)
+                layer.options.weight = 0.8
+                layer.options.fillOpacity = 0.65
+            }
+        })
+        shpfile.addTo(map);
+        current_transcore_shapefile = shpfile;
+    }
+
 
     function buildDropdownMenu(map) {
         var checkList = document.getElementById('filter-menu');
@@ -2112,9 +2238,18 @@ function new_archived_incident_cluster_layer() {
         document.querySelector(".traffic_condition").addEventListener('click', function () {
             builtTrafficMap();
         });
-        // document.querySelector(".bike_path").addEventListener('click', function () {
-        //     builtBikePathMap();
-        // });
+        document.querySelector(".walk_score").addEventListener('click', function () {
+            console.log('walk_score click')
+            buildWalkScoreMap();
+        });
+        document.querySelector(".bike_score").addEventListener('click', function () {
+            console.log('bike_score click')
+            buildBikeScoreMap();
+        });
+        document.querySelector(".transit_score").addEventListener('click', function () {
+            console.log('transit_score click')
+            buildTransitScoreMap();
+        });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
         var checkboxTwoSmoke = document.querySelector(".two-hour-smoke");
