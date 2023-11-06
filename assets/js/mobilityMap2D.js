@@ -2226,6 +2226,54 @@ function new_archived_incident_cluster_layer() {
         current_transit_desert = shpfile;
     }
 
+    let current_transit_desert_v1 = null
+    function buildTransitDesertMap_v1() {
+        if (current_transit_desert_v1 != null){
+            map.removeLayer(current_transit_desert_v1)
+            current_transit_desert_v1 = null
+        }
+        if (!document.querySelector(".transit_desert_v1").checked) {
+            return
+        }
+        let shapefile_path = "data/transit_desert_v1.zip";
+        let popupContent = ``;
+        function getColor(d) {
+            return d < -1  ? '#E31A1C' :
+                   d <= 0   ? '#F8DE7E' :
+                   d < 1   ? '#CDCA74' :
+                             '#4D8C57' ;
+        }
+        function getDescription(d) {
+            return d < -1  ? 'Transit Desert' :
+                   d <= 0   ? 'Properly Served' :
+                   d < 1   ? 'Properly Served' :
+                             'Transit Oasis' ;
+        }
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                let score = Number(feature.properties["Gap_Zscore"]);
+                if (isNaN(score)) {
+                    score = 0
+                }
+                popupContent = `
+                <div class="basic-info">
+                    <span>GEOID: ${feature.properties["GEOID"]}</span><BR>
+                </div>
+                <div class="stats-info">
+                    <span>Transit Desert Index: ${score} </span><BR>
+                    <span>Description: ${getDescription(score)} </span><BR>
+                </div>
+                `;
+                layer.bindPopup(popupContent);
+                layer.options.color = getColor(score)
+                layer.options.weight = 0.8
+                layer.options.fillOpacity = 0.65
+            }
+        })
+        shpfile.addTo(map);
+        current_transit_desert_v1 = shpfile;
+    }
+
 
     function buildDropdownMenu(map) {
         var checkList = document.getElementById('filter-menu');
@@ -2301,6 +2349,10 @@ function new_archived_incident_cluster_layer() {
         document.querySelector(".transit_desert").addEventListener('click', function () {
             console.log('transit_desert click')
             buildTransitDesertMap();
+        });
+        document.querySelector(".transit_desert_v1").addEventListener('click', function () {
+            console.log('transit_desert_v1 click')
+            buildTransitDesertMap_v1();
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
