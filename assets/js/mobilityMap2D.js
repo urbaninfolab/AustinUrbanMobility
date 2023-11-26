@@ -2274,6 +2274,60 @@ function new_archived_incident_cluster_layer() {
         current_transit_desert_v1 = shpfile;
     }
 
+    let current_bicycle_facility = null
+    function buildBicycleFacility() {
+        if (current_bicycle_facility != null){
+            map.removeLayer(current_bicycle_facility)
+            current_bicycle_facility = null
+        }
+        if (!document.querySelector(".bicycle_facilities").checked) {
+            return
+        }
+        let shapefile_path = "data/bicycle_facilities.zip";
+        let popupContent = ``;
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                popupContent = `
+                <div class="basic-info">
+                    <span>ID: ${feature.properties["objectid"]}</span><BR>
+                    <span>Street: ${feature.properties["full_stree"]}</span><BR>
+                    <span>Type: ${feature.properties["line_type"]}</span><BR>
+                    <span>Level: ${feature.properties["bike_level"]}</span><BR>
+                </div>
+                `;
+                layer.bindPopup(popupContent);
+            }
+        })
+        shpfile.addTo(map);
+        current_bicycle_facility = shpfile;
+    }
+
+    let current_city_corridor = null
+    function buildCityCorridor() {
+        if (current_city_corridor != null){
+            map.removeLayer(current_city_corridor)
+            current_city_corridor = null
+        }
+        if (!document.querySelector(".city_corridor").checked) {
+            return
+        }
+        let shapefile_path = "data/major_city_corridors.zip";
+        let popupContent = ``;
+        let shpfile = new L.Shapefile(shapefile_path, {
+            onEachFeature: function(feature,layer){
+                popupContent = `
+                <div class="basic-info">
+                    <span>Name: ${feature.properties["name"]}</span><BR>
+                    <span>Length: ${feature.properties["length"]} mile</span><BR>
+                </div>
+                `;
+                layer.bindPopup(popupContent);
+            }
+        })
+        shpfile.addTo(map);
+        current_city_corridor = shpfile;
+    }
+
 
     function buildDropdownMenu(map) {
         var checkList = document.getElementById('filter-menu');
@@ -2353,6 +2407,14 @@ function new_archived_incident_cluster_layer() {
         document.querySelector(".transit_desert_v1").addEventListener('click', function () {
             console.log('transit_desert_v1 click')
             buildTransitDesertMap_v1();
+        });
+        document.querySelector(".bicycle_facilities").addEventListener('click', function () {
+            console.log('bicycle_facilities click')
+            buildBicycleFacility();
+        });
+        document.querySelector(".city_corridor").addEventListener('click', function () {
+            console.log('city_corridor click')
+            buildCityCorridor();
         });
 
         var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
