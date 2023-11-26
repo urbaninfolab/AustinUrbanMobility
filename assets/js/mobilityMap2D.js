@@ -2322,6 +2322,8 @@ function new_archived_incident_cluster_layer() {
                 </div>
                 `;
                 layer.bindPopup(popupContent);
+                layer.options.color = "#34495E"
+                layer.options.weight = 4
             }
         })
         shpfile.addTo(map);
