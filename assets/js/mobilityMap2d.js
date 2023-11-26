@@ -2296,9 +2296,12 @@ function new_archived_incident_cluster_layer() {
                 </div>
                 `;
                 layer.bindPopup(popupContent);
+                layer.options.color = "#6C3483"
+                layer.options.weight = 1.5
             }
         })
         shpfile.addTo(map);
+        console.log(shpfile);
         current_bicycle_facility = shpfile;
     }
 
@@ -2327,6 +2330,7 @@ function new_archived_incident_cluster_layer() {
             }
         })
         shpfile.addTo(map);
+        console.log(shpfile)
         current_city_corridor = shpfile;
     }
 
