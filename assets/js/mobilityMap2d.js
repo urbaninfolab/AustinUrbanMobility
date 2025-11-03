@@ -2522,6 +2522,36 @@ function new_archived_incident_cluster_layer() {
         */
 
         });
+
+        // Initialize default checked checkboxes on page load
+        // Mapping of checkbox class names to their corresponding build functions
+        const checkboxBuildMap = {
+            'firedept': buildPOIMap,
+            'policedept': buildPOIMap,
+            'hospital': buildPOIMap,
+            'transit': buildTranMap,
+            'micromobility': buildScooterMap,
+            'active_incident': buildLiveIncidentMap,
+            'archived_incident': buildArchivedIncidentMap,
+            'choropleth_incident': buildIncidentChoropleth,
+            'road_incident': buildRoadIncident,
+            'traffic_condition': builtTrafficMap,
+            'walk_score': buildWalkScoreMap,
+            'bike_score': buildBikeScoreMap,
+            'transit_score': buildTransitScoreMap,
+            'transit_desert': buildTransitDesertMap,
+            'transit_desert_v1': buildTransitDesertMap_v1,
+            'bicycle_facilities': buildBicycleFacility,
+            'city_corridor': buildCityCorridor
+        };
+
+        // Automatically trigger build functions for all checked checkboxes
+        Object.keys(checkboxBuildMap).forEach(function(className) {
+            const checkbox = document.querySelector('.' + className);
+            if (checkbox && checkbox.checked) {
+                checkboxBuildMap[className]();
+            }
+        });
     }
 
     function addShapefileRadioListener(map) {
