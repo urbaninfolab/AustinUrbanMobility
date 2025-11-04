@@ -576,7 +576,7 @@ function new_archived_incident_cluster_layer() {
     }
 
     function getToday() {
-        document.getElementById("CurrentSelectedDate").textContent = "&#12288;&#12288;Today";
+        document.getElementById("CurrentSelectedDate").textContent = "⠀ ⠀᠎⠀ ⠀Today";
         var datePicker = document.querySelector('.date-picker');
         datePicker.style.display = 'none';
                                 // clear all markers and rebuild map layer
@@ -596,7 +596,7 @@ function new_archived_incident_cluster_layer() {
     }
 
     function getYesterday() {
-        document.getElementById("CurrentSelectedDate").textContent = "&#12288;&#12288;Yesterday";
+        document.getElementById("CurrentSelectedDate").textContent = "⠀ ⠀᠎⠀ ⠀Yesterday";
         var datePicker = document.querySelector('.date-picker');
         datePicker.style.display = 'none';
                         // clear all markers and rebuild map layer
@@ -616,7 +616,7 @@ function new_archived_incident_cluster_layer() {
 
 
     function get3Days() {
-        document.getElementById("CurrentSelectedDate").textContent = "&#12288;&#12288;Last 3 Days";
+        document.getElementById("CurrentSelectedDate").textContent = "⠀ ⠀᠎⠀ ⠀Last 3 Days";
         var datePicker = document.querySelector('.date-picker');
         datePicker.style.display = 'none';
                         // clear all markers and rebuild map layer
@@ -637,7 +637,7 @@ function new_archived_incident_cluster_layer() {
     }
 
     function getCustom() {
-        document.getElementById("CurrentSelectedDate").textContent = "&#12288;&#12288;Custom";
+        document.getElementById("CurrentSelectedDate").innerHTML = "⠀ ⠀᠎⠀ ⠀Custom";;
 
         var datePicker = document.querySelector('.date-picker');
         datePicker.style.display = 'none';
@@ -1211,31 +1211,97 @@ function new_archived_incident_cluster_layer() {
         if (!document.querySelector(".transit").checked) {
             return
         }
-        url = "https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json"
-        let response = await fetch(url);
-        let transit_json = response.json();
-        console.log(transit_json)
-        for (let i = 0; i < transit_json["entity"].length; i++) {
-            if (!transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
-                continue;
+        const transitUrl = "https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json";
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(transitUrl);
+        
+        try {
+            // Try direct fetch first, then fallback to CORS proxy if needed
+            let response = await fetch(transitUrl, {
+                mode: 'cors',
+                credentials: 'omit'
+            });
+            
+            // Check response status before parsing JSON
+            if (!response.ok) {
+                throw new Error('Direct fetch failed');
             }
-            let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
-            let x = transit_json["entity"][i]["vehicle"]["position"]["longitude"];
-            let transit_marker = new L.marker([y,x]);
-            let iconLink = "assets/images/bus_icon.png";
-            transit_marker.setIcon(L.icon({
-                iconUrl: iconLink,
-                iconSize: [24, 32],
-                iconAnchor: [12, 32],
-                popupAnchor: [0, -30]
-            }));
-            var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
-            var vehicle_id = transit_json["entity"][i]["id"]
-            var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
-            transit_marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
+            
+            let transit_json = await response.json();
+            
+            console.log(transit_json);
+            
+            if (!transit_json || !transit_json["entity"]) {
+                console.error('Invalid transit data format');
+                return;
+            }
+            
+            for (let i = 0; i < transit_json["entity"].length; i++) {
+                if (!transit_json["entity"][i]["vehicle"] || !transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
+                    continue;
+                }
+                let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
+                let x = transit_json["entity"][i]["vehicle"]["position"]["longitude"];
+                let transit_marker = new L.marker([y,x]);
+                let iconLink = "assets/images/bus_icon.png";
+                transit_marker.setIcon(L.icon({
+                    iconUrl: iconLink,
+                    iconSize: [24, 32],
+                    iconAnchor: [12, 32],
+                    popupAnchor: [0, -30]
+                }));
+                var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
+                var vehicle_id = transit_json["entity"][i]["id"]
+                var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
+                transit_marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
 
-            transit_markers.addLayer(transit_marker)
-            transitLocations.addLayer(transit_marker)
+                transit_markers.addLayer(transit_marker)
+                transitLocations.addLayer(transit_marker)
+            }
+        } catch (error) {
+            console.log('Direct fetch failed, trying CORS proxy:', error);
+            try {
+                // Fallback to CORS proxy
+                let response = await fetch(proxyUrl, {
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+                if (!response.ok) {
+                    throw new Error('Proxy fetch failed');
+                }
+                let transit_json = await response.json();
+                console.log(transit_json);
+                
+                if (!transit_json || !transit_json["entity"]) {
+                    console.error('Invalid transit data format');
+                    return;
+                }
+                
+                for (let i = 0; i < transit_json["entity"].length; i++) {
+                    if (!transit_json["entity"][i]["vehicle"] || !transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
+                        continue;
+                    }
+                    let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
+                    let x = transit_json["entity"][i]["vehicle"]["position"]["longitude"];
+                    let transit_marker = new L.marker([y,x]);
+                    let iconLink = "assets/images/bus_icon.png";
+                    transit_marker.setIcon(L.icon({
+                        iconUrl: iconLink,
+                        iconSize: [24, 32],
+                        iconAnchor: [12, 32],
+                        popupAnchor: [0, -30]
+                    }));
+                    var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
+                    var vehicle_id = transit_json["entity"][i]["id"]
+                    var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
+                    transit_marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
+
+                    transit_markers.addLayer(transit_marker)
+                    transitLocations.addLayer(transit_marker)
+                }
+            } catch (proxyError) {
+                console.error('Error fetching transit data:', proxyError);
+                alert('Failed to load transit location data. This may be due to CORS restrictions. Please contact the administrator.');
+            }
         }
     }
 
@@ -1250,27 +1316,88 @@ function new_archived_incident_cluster_layer() {
         if (!document.querySelector(".micromobility").checked) {
             return
         }
-        url = "https://smartcity.tacc.utexas.edu/data/transportation/freebike.json"
-        let response = await fetch(url);
-        let scooter_json = response.json();
-        console.log(scooter_json)
-        for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
-            let y = scooter_json["data"]["bikes"][i]["lat"];
-            let x = scooter_json["data"]["bikes"][i]["lon"];
-            let scooter_marker = new L.marker([y,x]);
-            let iconLink = "assets/images/scooter_icon.png";
-            scooter_marker.setIcon(L.icon({
-                iconUrl: iconLink,
-                iconSize: [24, 32],
-                iconAnchor: [12, 32],
-                popupAnchor: [0, -30]
-            }));
-            var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
-            var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
-            scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
+        const scooterUrl = "https://smartcity.tacc.utexas.edu/data/transportation/freebike.json";
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(scooterUrl);
+        
+        try {
+            // Try direct fetch first, then fallback to CORS proxy if needed
+            let response = await fetch(scooterUrl, {
+                mode: 'cors',
+                credentials: 'omit'
+            });
+            
+            // Check response status before parsing JSON
+            if (!response.ok) {
+                throw new Error('Direct fetch failed');
+            }
+            
+            let scooter_json = await response.json();
+            console.log(scooter_json);
+            
+            if (!scooter_json || !scooter_json["data"] || !scooter_json["data"]["bikes"]) {
+                console.error('Invalid scooter data format');
+                return;
+            }
+            
+            for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
+                let y = scooter_json["data"]["bikes"][i]["lat"];
+                let x = scooter_json["data"]["bikes"][i]["lon"];
+                let scooter_marker = new L.marker([y,x]);
+                let iconLink = "assets/images/scooter_icon.png";
+                scooter_marker.setIcon(L.icon({
+                    iconUrl: iconLink,
+                    iconSize: [24, 32],
+                    iconAnchor: [12, 32],
+                    popupAnchor: [0, -30]
+                }));
+                var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
+                var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
+                scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
 
-            scooter_markers.addLayer(scooter_marker)
-            scooterLocations.addLayer(scooter_marker)
+                scooter_markers.addLayer(scooter_marker)
+                scooterLocations.addLayer(scooter_marker)
+            }
+        } catch (error) {
+            console.log('Direct fetch failed, trying CORS proxy:', error);
+            try {
+                // Fallback to CORS proxy
+                let response = await fetch(proxyUrl, {
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+                if (!response.ok) {
+                    throw new Error('Proxy fetch failed');
+                }
+                let scooter_json = await response.json();
+                console.log(scooter_json);
+                
+                if (!scooter_json || !scooter_json["data"] || !scooter_json["data"]["bikes"]) {
+                    console.error('Invalid scooter data format');
+                    return;
+                }
+                
+                for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
+                    let y = scooter_json["data"]["bikes"][i]["lat"];
+                    let x = scooter_json["data"]["bikes"][i]["lon"];
+                    let scooter_marker = new L.marker([y,x]);
+                    let iconLink = "assets/images/scooter_icon.png";
+                    scooter_marker.setIcon(L.icon({
+                        iconUrl: iconLink,
+                        iconSize: [24, 32],
+                        iconAnchor: [12, 32],
+                        popupAnchor: [0, -30]
+                    }));
+                    var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
+                    var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
+                    scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
+
+                    scooter_markers.addLayer(scooter_marker)
+                    scooterLocations.addLayer(scooter_marker)
+                }
+            } catch (proxyError) {
+                console.error('Error fetching scooter data:', proxyError);
+                alert('Failed to load micromobility location data. This may be due to CORS restrictions. Please contact the administrator.');
+            }
         }
     }
 
@@ -1727,18 +1854,45 @@ function new_archived_incident_cluster_layer() {
         // mobility JSON data
         if (transit) {
             transit_markers = new_transit_cluster_layer();
-            fetch('https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json')
+            // Try direct fetch first, then fallback to CORS proxy if needed
+            const transitUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json';
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(transitUrl);
+            
+            // Try direct fetch with explicit CORS mode
+            fetch(transitUrl, {
+                mode: 'cors',
+                credentials: 'omit'
+            })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.json(); 
                 })
+                .catch(error => {
+                    console.log('Direct fetch failed, trying CORS proxy:', error);
+                    // Fallback to CORS proxy
+                    return fetch(proxyUrl, {
+                        mode: 'cors',
+                        credentials: 'omit'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Proxy fetch failed');
+                        }
+                        return response.json();
+                    });
+                })
                 .then(transit_json => {
                     console.log(transit_json);
                     
+                    if (!transit_json || !transit_json["entity"]) {
+                        console.error('Invalid transit data format');
+                        return;
+                    }
+                    
                     for (let i = 0; i < transit_json["entity"].length; i++) {
-                        if (!transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
+                        if (!transit_json["entity"][i]["vehicle"] || !transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
                             continue;
                         }
                         let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
@@ -1759,11 +1913,12 @@ function new_archived_incident_cluster_layer() {
                         transit_markers.addLayer(transit_marker)
                         transitLocations.addLayer(transit_marker)
                     }
+                    map.addLayer(transit_markers)
                 })
                 .catch(error => {
-                    console.log('Error:', error);
+                    console.error('Error fetching transit data:', error);
+                    alert('Failed to load transit location data. This may be due to CORS restrictions. Please contact the administrator.');
                 });
-            map.addLayer(transit_markers)
         }
         
     }
@@ -1782,39 +1937,67 @@ function new_archived_incident_cluster_layer() {
         // mobility JSON data
         if (micromobility) {
             scooter_markers = new_scooter_cluster_layer();
-            fetch('https://smartcity.tacc.utexas.edu/data/transportation/freebike.json')
-              .then(response => {
-                // Check if the response is ok (status code in the range 200-299)
-                if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                }
-                return response.json(); // Parse the response body as JSON
-              })
-              .then(scooter_json => {
-                console.log(scooter_json);
-                for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
-                    let y = scooter_json["data"]["bikes"][i]["lat"];
-                    let x = scooter_json["data"]["bikes"][i]["lon"];
-                    let scooter_marker = new L.marker([y,x]);
-                    let iconLink = "assets/images/scooter_icon.png";
-                    scooter_marker.setIcon(L.icon({
-                        iconUrl: iconLink,
-                        iconSize: [24, 32],
-                        iconAnchor: [12, 32],
-                        popupAnchor: [0, -30]
-                    }));
-                    var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
-                    var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
-                    scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
-        
-                    scooter_markers.addLayer(scooter_marker)
-                    scooterLocations.addLayer(scooter_marker)
-                }
+            // Try direct fetch first, then fallback to CORS proxy if needed
+            const scooterUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/freebike.json';
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(scooterUrl);
+            
+            // Try direct fetch with explicit CORS mode
+            fetch(scooterUrl, {
+                mode: 'cors',
+                credentials: 'omit'
             })
-            .catch(error => {
-                console.log('Error:', error);
-            });
-            map.addLayer(scooter_markers)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); 
+                })
+                .catch(error => {
+                    console.log('Direct fetch failed, trying CORS proxy:', error);
+                    // Fallback to CORS proxy
+                    return fetch(proxyUrl, {
+                        mode: 'cors',
+                        credentials: 'omit'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Proxy fetch failed');
+                        }
+                        return response.json();
+                    });
+                })
+                .then(scooter_json => {
+                    console.log(scooter_json);
+                    
+                    if (!scooter_json || !scooter_json["data"] || !scooter_json["data"]["bikes"]) {
+                        console.error('Invalid scooter data format');
+                        return;
+                    }
+                    
+                    for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
+                        let y = scooter_json["data"]["bikes"][i]["lat"];
+                        let x = scooter_json["data"]["bikes"][i]["lon"];
+                        let scooter_marker = new L.marker([y,x]);
+                        let iconLink = "assets/images/scooter_icon.png";
+                        scooter_marker.setIcon(L.icon({
+                            iconUrl: iconLink,
+                            iconSize: [24, 32],
+                            iconAnchor: [12, 32],
+                            popupAnchor: [0, -30]
+                        }));
+                        var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
+                        var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
+                        scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
+            
+                        scooter_markers.addLayer(scooter_marker)
+                        scooterLocations.addLayer(scooter_marker)
+                    }
+                    map.addLayer(scooter_markers)
+                })
+                .catch(error => {
+                    console.error('Error fetching scooter data:', error);
+                    alert('Failed to load micromobility location data. This may be due to CORS restrictions. Please contact the administrator.');
+                });
         }
     }
 
@@ -1827,17 +2010,43 @@ function new_archived_incident_cluster_layer() {
         let incident = document.querySelector(".active_incident").checked;
         if (incident) {
             console.log("Active Incident checked")
-            // let incident_json = JSON.parse('[{"Published Date": "09/26/2023 09:27:10 PM +0000", "Issue Reported": "Crash Service", "Address": "4000-4017 S 1st St", "Latitude": 30.225932, "Longitude": -97.769825, "Status": "ACTIVE", "time": "2023-09-26 16:27:10"}, {"Published Date": "09/26/2023 10:33:20 PM +0000", "Issue Reported": "Crash Urgent", "Address": "13318-13534 N Sh 45 W Wb", "Latitude": 30.471481, "Longitude": -97.788028, "Status": "ACTIVE", "time": "2023-09-26 17:33:20"}, {"Published Date": "09/26/2023 10:54:35 PM +0000", "Issue Reported": "Crash Service", "Address": "Provines Dr / N Lamar Blvd", "Latitude": 30.376738, "Longitude": -97.689309, "Status": "ACTIVE", "time": "2023-09-26 17:54:35"}, {"Published Date": "09/26/2023 11:35:47 PM +0000", "Issue Reported": "COLLISION", "Address": "19503 Old Burnet Rd", "Latitude": 30.46461, "Longitude": -97.959907, "Status": "ACTIVE", "time": "2023-09-26 18:35:47"}, {"Published Date": "09/26/2023 11:54:22 PM +0000", "Issue Reported": "Crash Service", "Address": "COLINTON AVE / HARRIS BRANCH PKWY", "Latitude": 30.372672, "Longitude": -97.611924, "Status": "ACTIVE", "time": "2023-09-26 18:54:22"}, {"Published Date": "09/26/2023 11:54:33 PM +0000", "Issue Reported": "Crash Service", "Address": "1971-1975 S Pleasant Valley Rd", "Latitude": 30.233645, "Longitude": -97.723418, "Status": "ACTIVE", "time": "2023-09-26 18:54:33"}]')
-            fetch('https://smartcity.tacc.utexas.edu/data/transportation/incident_active.json')
+            // Try direct fetch first, then fallback to CORS proxy if needed
+            const incidentUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/incident_active.json';
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(incidentUrl);
+            
+            // Try direct fetch with explicit CORS mode
+            fetch(incidentUrl, {
+                mode: 'cors',
+                credentials: 'omit'
+            })
               .then(response => {
-                // Check if the response is ok (status code in the range 200-299)
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
-                  }
-                  return response.json(); // Parse the response body as JSON
+                }
+                return response.json();
+              })
+              .catch(error => {
+                console.log('Direct fetch failed, trying CORS proxy:', error);
+                // Fallback to CORS proxy
+                return fetch(proxyUrl, {
+                    mode: 'cors',
+                    credentials: 'omit'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Proxy fetch failed');
+                    }
+                    return response.json();
+                });
               })
               .then(incident_json => {
-                console.log(incident_json)
+                console.log(incident_json);
+                
+                if (!incident_json || !Array.isArray(incident_json)) {
+                    console.error('Invalid incident data format');
+                    return;
+                }
+                
                 for (let i = 0; i < incident_json.length; i++) {
                     let y = incident_json[i]["Latitude"];
                     let x = incident_json[i]["Longitude"];
@@ -1858,7 +2067,8 @@ function new_archived_incident_cluster_layer() {
                 }
               })
               .catch(error => {
-                console.log('Error:', error);
+                console.error('Error fetching incident data:', error);
+                alert('Failed to load active traffic incident data. This may be due to CORS restrictions. Please contact the administrator.');
               });
         }
     }
@@ -1876,16 +2086,43 @@ function new_archived_incident_cluster_layer() {
         // mobility JSON data
         if (archived_incident) {
             archived_incident_markers = new_archived_incident_cluster_layer();
-            fetch('https://smartcity.tacc.utexas.edu/data/transportation/incident_archived.json')
+            // Try direct fetch first, then fallback to CORS proxy if needed
+            const archivedUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/incident_archived.json';
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(archivedUrl);
+            
+            // Try direct fetch with explicit CORS mode
+            fetch(archivedUrl, {
+                mode: 'cors',
+                credentials: 'omit'
+            })
               .then(response => {
-                // Check if the response is ok (status code in the range 200-299)
                 if (!response.ok) {
-                  throw new Error('Network response was not ok');
+                    throw new Error('Network response was not ok');
                 }
-                return response.json(); // Parse the response body as JSON
+                return response.json();
+              })
+              .catch(error => {
+                console.log('Direct fetch failed, trying CORS proxy:', error);
+                // Fallback to CORS proxy
+                return fetch(proxyUrl, {
+                    mode: 'cors',
+                    credentials: 'omit'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Proxy fetch failed');
+                    }
+                    return response.json();
+                });
               })
               .then(archived_incident_json => {
                 console.log(archived_incident_json);
+                
+                if (!archived_incident_json || !Array.isArray(archived_incident_json)) {
+                    console.error('Invalid archived incident data format');
+                    return;
+                }
+                
                 for (let i = 0; i < archived_incident_json.length; i++) {
                     let y = archived_incident_json[i]["Latitude"];
                     let x = archived_incident_json[i]["Longitude"];
@@ -1906,11 +2143,12 @@ function new_archived_incident_cluster_layer() {
                     archived_incident_markers.addLayer(archived_incident_marker)
                     incidentLocations.addLayer(archived_incident_marker)
                 }
+                map.addLayer(archived_incident_markers)
             })
             .catch(error => {
-                console.log('Error:', error);
+                console.error('Error fetching archived incident data:', error);
+                alert('Failed to load archived traffic incident data. This may be due to CORS restrictions. Please contact the administrator.');
             });
-            map.addLayer(archived_incident_markers)
         }
     }
 
