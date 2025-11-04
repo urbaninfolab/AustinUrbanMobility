@@ -172,32 +172,6 @@ Check My Location button code leaflet
 	</div>
 
 	<!-- Modal -->
-	<div class="modal fade" id="statsModal" role="dialog" style="overflow: hidden; margin-top: 10px;">
-		<div class="modal-dialog" style="width: 80%; height: 120%;overflow: hidden; ">
-
-			<!-- Modal content-->
-			<div class="modal-content" style="height: 80%; overflow: hidden;">
-				<div class="modal-header" style="overflow: hidden;">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Active Fire Incidents Stats</h4>
-				</div>
-				<iframe frameBorder="0" src="https://smartcity.tacc.utexas.edu/FireIncident/FireIncidentStats.html"
-					width="130%" height="130%" style="overflow: hidden;        -ms-zoom: 0.75; 
-				-moz-transform: scale(0.75);
-				-moz-transform-origin: 0 0;
-				-o-transform: scale(0.75);
-				-o-transform-origin: 0 0;
-				-webkit-transform: scale(0.75);
-				-webkit-transform-origin: 0 0;"></iframe>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-
-	<!-- Modal -->
 	<div class="modal fade" id="infoModal" role="dialog">
 		<div id="InfoBox" class="modal-dialog">
 
@@ -305,9 +279,6 @@ Check My Location button code leaflet
 	</div>
 
 	<script type="text/javascript">
-		function stats() {
-			$("#statsModal").modal({ backdrop: true });
-		}
 		function info() {
 			$("#infoModal").modal({ backdrop: true });
 		}
@@ -355,63 +326,12 @@ Check My Location button code leaflet
 
 
 			<div style="float: right; margin-right: 2rem; margin-top:-10px;" class="date-bar">
-
-				<div class="date-picker">
-					<!--<label for="start">Start date:</label>-->
-					<input type="date" id="start" name="trip-start" min="2022-01-31">
-				</div>
-
 				<!-- <div class="status-toggle"> </div> -->
 
 				<div id="filter-menu" class="dropdown-check-list" tabindex="100">
 					<span class="anchor">&#12288;&#12288;</span>
 
 					<ul class="items">
-						<b>
-							<li style="display: none;">Fire Data</li>
-						</b>
-						<li style="display: none;"><input style="margin-left: 15px;" type="checkbox"
-								class="active-fire" /> Inactive Fire </li>
-						<b>
-							<li style="display: none;">Smoke Data</li>
-						</b>
-						<li style="display: none;"><input style="margin-left: 15px;" type="checkbox"
-								class="one-hour-smoke" /> 1 Hour Forecast </li>
-						<li style="display: none;"><input style="margin-left: 15px;" type="checkbox"
-								class="two-hour-smoke" /> 2 Hour Forecast </li>
-						<li style="display: none;"><input style="margin-left: 15px;" type="checkbox"
-								class="three-hour-smoke" /> 3 Hour Forecast </li>
-						<b>
-							<li style="display: none;">Air Data</li>
-						</b>
-						<li style="display: none;"><input style="margin-left: 15px;" type="checkbox"
-								class="purple-air" /> PurpleAir Data</li>
-						<!-- Microsoft seems to have pulled the rug on their air sensors -->
-						<li style="display: none;"><input style=" margin-left: 15px;" type="checkbox"
-								class="microsoft-air" /> MSR Air Quality Sensors </li>
-						<b>
-							<li style="display: none;">Shapefile</li>
-						</b>
-						<li style="display: none;"><input style="margin-left: 15px;" type="radio" id="test-risk-radio"
-								name="shapefile-radio" value="test-risk-radio" />
-							<label for="test-risk-radio">Fire Risk</label>
-						</li>
-						<li style="display: none;"><input style="margin-left: 15px;" type="radio" id="afd-radio"
-								name="shapefile-radio" value="afd-radio" />
-							<label for="afd-radio">AFD Coverage</label>
-						</li>
-						<li style="display:none"><input style="margin-left: 15px;" type="radio" id="hvi-radio"
-								name="shapefile-radio" value="hvi-radio" />
-							<label for="hvi-radio">HVI Map</label>
-						</li>
-						<li style="display: none;"><input style="margin-left: 15px;" type="radio" id="fire-risk-radio"
-								name="shapefile-radio" value="fire-risk-radio" />
-							<label for="fire-risk-radio">Fire Vulnerability Map</label>
-						</li>
-						<li style="display: none;"><input style="margin-left: 15px;" type="radio" id="no-shapefile"
-								name="shapefile-radio" value="none-radio" checked />
-							<label for="none-radio">None</label>
-						</li>
 						<b>
 							<li>Points of Interest</li>
 						</b>

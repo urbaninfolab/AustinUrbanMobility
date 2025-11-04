@@ -567,143 +567,6 @@ function new_archived_incident_cluster_layer() {
     }
 
 
-    function buildSelectBar(map) {
-        var checkList = document.getElementById('filter-menu');
-        checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
-            if (checkList.classList.contains('visible'))
-                checkList.classList.remove('visible');
-            else
-                checkList.classList.add('visible');
-        }
-        // set up value of date picker
-        var dateControl = document.querySelector('input[type="date"]');
-        dateControl.value = date;
-        dateControl.max = date;
-        // hide date picker
-        var datePicker = document.querySelector('.date-picker');
-        datePicker.style.display = 'none';
-        // add event listener
-        datePicker.addEventListener('change', (event) => {
-            // clear all markers and rebuild map layer
-            /*map.eachLayer(function (layer) {
-                map.removeLayer(layer);
-            });
-            addMapLayer(map);*/
-            mapFireIncident(map, [event.target.value], inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag)
-        })
-
-        //build select button
-        const barOuter = document.querySelector(".bar-outer");
-        const options = document.querySelectorAll(".bar-grey .option");
-        let current = 1;
-        options.forEach((option, i) => (option.index = i + 1));
-        options.forEach(option =>
-            option.addEventListener("click", function () {
-                barOuter.className = "bar-outer";
-                barOuter.classList.add(`pos${option.index}`);
-                if (option.index > current) {
-                    barOuter.classList.add("right");
-                } else if (option.index < current) {
-                    barOuter.classList.add("left");
-                }
-                current = option.index;
-                // console.log('index: ', current)
-
-                datePicker.style.display = 'none';
-                // define button onclick action
-                switch (current) {
-                    // Today Button
-                    case 1:
-                        // clear all markers and rebuild map layer
-                        /*map.eachLayer(function (layer) {
-                            map.removeLayer(layer);
-                        });
-                        addMapLayer(map);*/
-                        // map today's fire data
-                        dateArray = [];
-                        var today = new Date();
-                        var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + today.getDate()).slice(-2);
-                        dateArray.push(date);
-                        mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        break;
-
-                    // Yesterday Button
-                    case 2:
-                        // clear all markers and rebuild map layer
-                        /*map.eachLayer(function (layer) {
-                            map.removeLayer(layer);
-                        });
-                        addMapLayer(map);*/
-                        // map yesterday's fire data
-                        dateArray = [];
-                        var today = new Date();
-                        var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + (today.getDate() - 1)).slice(-2);
-                        dateArray.push(date);
-                        mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        break;
-
-                    // Past 3 days Button
-                    case 3:
-                        // clear all markers and rebuild map layer
-                        /*map.eachLayer(function (layer) {
-                            map.removeLayer(layer);
-                        });
-                        addMapLayer(map);*/
-                        // map fire data of past 3 days 
-                        dateArray = [];
-                        var today = new Date();
-                        for (let i = 0; i < 3; i++) {
-                            var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + (today.getDate() - i)).slice(-2);
-                            dateArray.push(date);
-                        }
-                        mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        break;
-
-                    // Custom Button
-                    case 4:
-                        // show date selector
-                        datePicker.style.display = 'block';
-                        break;
-                }
-            }));
-    }
-
-    function buildStatusToggleButton(map, checkbox) {
-        
-        if (checkbox.checked) {
-            inactive_flag = true;
-            map.addLayer(inactiveFires)
-        } else {
-            inactive_flag = false;
-            map.removeLayer(inactiveFires);
-        }
-
-
-        /*
-        checkbox.addEventListener('click', function (e) {
-            // checkbox checked => all fire
-            if (checkbox.checked) {
-                inactive_flag = true;
-            } else {
-                inactive_flag = false;
-            }
-            // clear all markers and rebuild map layer
-            map.eachLayer(function (layer) {
-                map.removeLayer(layer);
-            });
-            addMapLayer(map);
-            // map today's fire data
-            dateArray = [];
-            var today = new Date();
-            var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + today.getDate()).slice(-2);
-            dateArray.push(date);
-            mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-
-        })
-        */
-    }
-
-
     var cachedShapefile = null 
 
     function buildShapefile(map, shapefile_display_flag) {
@@ -2379,11 +2242,6 @@ function new_archived_incident_cluster_layer() {
                 checkList.classList.add('visible');
         }
         // add event listener
-        var checkboxActiveFire = document.querySelector(".active-fire");
-        checkboxActiveFire.addEventListener('click', function () {
-            buildStatusToggleButton(map, checkboxActiveFire);
-        });
-
         document.querySelector(".firedept").addEventListener('click', function () {
             buildPOIMap();
         });
@@ -2458,105 +2316,6 @@ function new_archived_incident_cluster_layer() {
             buildCityCorridor();
         });
 
-        var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
-        var checkboxTwoSmoke = document.querySelector(".two-hour-smoke");
-        var checkboxThreeSmoke = document.querySelector(".three-hour-smoke");
-
-        checkboxOneSmoke.addEventListener('click', function () {
-            changeSmokeForecast(checkboxOneSmoke, onehourForecastGroup);
-        });
-        checkboxTwoSmoke.addEventListener('click', function () {
-            changeSmokeForecast(checkboxTwoSmoke, twohourForecastGroup);
-        });
-        checkboxThreeSmoke.addEventListener('click', function () {
-            changeSmokeForecast(checkboxThreeSmoke, threehourForecastGroup);
-        });
-
-        function changeSmokeForecast(checkbox, forecastGroup) {
-            // Clear other smoke forecast layers,
-            // add relevant KML for current forecast
-            if (checkbox.checked) {
-                map.removeLayer(onehourForecastGroup);
-                map.removeLayer(twohourForecastGroup);
-                map.removeLayer(threehourForecastGroup);
-                checkboxOneSmoke.checked = false;
-                checkboxTwoSmoke.checked = false;
-                checkboxThreeSmoke.checked = false;
-                checkbox.checked = true;
-                forecastGroup.addTo(map);
-            } else {
-                map.removeLayer(forecastGroup);
-            }
-        }
-
-        changeSmokeForecast(checkboxOneSmoke, onehourForecastGroup);
-
-        /*var checkLocation = document.querySelector(".option2");
-        checkLocation.addEventListener('click', function () {
-            console.log("Checking location");
-            getUserLocation();
-        }); */
-
-        var checkboxPurpleAir = document.querySelector(".purple-air");
-        checkboxPurpleAir.addEventListener('click', function () {
-            if (checkboxPurpleAir.checked) {
-                purple_air_diaplay_flag = true
-                if(microsoft_air_display_flag) {
-                    map.removeLayer(purpleAirMonitors)
-                    map.removeLayer(microsoftAirMonitors)
-                    map.addLayer(markers)
-                }
-                else 
-                    map.addLayer(purpleAirMonitors)
-            } else {
-                purple_air_diaplay_flag = false
-                if(microsoft_air_display_flag) {
-                    map.removeLayer(markers)
-                    map.addLayer(microsoftAirMonitors)
-                }
-                else 
-                    map.removeLayer(purpleAirMonitors)
-            }
-            // console.log(purple_air_diaplay_flag);
-            // clear all markers and rebuild map layer
-            /*map.eachLayer(function (layer) {
-                map.removeLayer(layer);
-            });
-            addMapLayer(map);
-            mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-        */
-
-        });
-
-        var checkboxMicrosoftAir = document.querySelector(".microsoft-air");
-        checkboxMicrosoftAir.addEventListener('click', function () {
-            if (checkboxMicrosoftAir.checked) {
-                microsoft_air_display_flag = true
-                if(purple_air_diaplay_flag) {
-                    map.removeLayer(microsoftAirMonitors)
-                    map.removeLayer(purpleAirMonitors)
-                    map.addLayer(markers)
-                }
-                else
-                    map.addLayer(microsoftAirMonitors)
-            } else {
-                microsoft_air_display_flag = false
-                if(purple_air_diaplay_flag) {
-                    map.removeLayer(markers)
-                    map.addLayer(purpleAirMonitors)
-                }
-                else
-                    map.removeLayer(microsoftAirMonitors)
-            }
-            // clear all markers and rebuild map layer
-            /*map.eachLayer(function (layer) {
-                map.removeLayer(layer);
-            });
-            addMapLayer(map);
-            mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-        */
-
-        });
 
         // Initialize default checked checkboxes on page load
         // Mapping of checkbox class names to their corresponding build functions
@@ -2613,40 +2372,12 @@ function new_archived_incident_cluster_layer() {
     var today = new Date();
     var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + today.getDate()).slice(-2);
     dateArray.push(date);
-    let shapefile_display_flag = 'none-radio';
-    // mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-    // addShapefileRadioListener(map);
-    buildSelectBar(map);
     buildDropdownMenu(map);
     map._layersMaxZoom = 19;
 
 
 
 
-    // add zostera legend
-    L.control.legend({
-        position: 'bottomleft',
-        items: [
-            {color: 'white', label: '<b>Fire Risk</b>'},
-            {color: 'red', label: 'Highest'},
-            {color: 'orange', label: 'Elevated'},
-            {color: 'yellow', label: 'Low'},
-            {color: 'white', label: ''},
-            {color: 'white', label: '<b>Smoke Levels</b>'},
-            {color: '#9cd74e', label: 'Good'},
-            {color: '#facf39', label: 'Moderate'},
-            {color: '#f68f47', label: 'Unhealthy for Sensitive Groups'},
-            {color: '#f55e5f', label: 'Unhealthy'},
-            {color: '#a070b5', label: 'Very Unhealthy'},
-            {color: '#a06a7b', label: 'Hazardous'},
-        ],
-        collapsed: true,
-        // insert different label for the collapsed legend button.
-        buttonHtml: 'Legend'
-    }).addTo(map);
-
-    document.getElementsByClassName("leaflet-left")[1].style.left = "5px"
-    document.getElementsByClassName("leaflet-legend-list")[0].style = "text-align: left;"
 
     // add geolocator for address
     //const provider = new GeoSearch.OpenStreetMapProvider();
@@ -2728,54 +2459,6 @@ L.control.watermark = function(opts) {
 
 L.control.watermark({ position: 'bottomright' }).addTo(map);
 
-
-L.Control.Watermark = L.Control.extend({
-    onAdd: function (map) {
-        var container = L.DomUtil.create('div');
-        container.type="button";
-        container.title="No cat";
-        container.value = "42";
-        container.classList = ["geocoder-control leaflet-control"]
-    
-        /*container.style.backgroundColor = 'white';     
-        //container.style.backgroundImage = "url(https://t1.gstatic.com/images?q=tbn:ANd9GcR6FCUMW5bPn8C4PbKak2BJQQsmC-K9-mbYBeFZm1ZM2w2GRy40Ew)";
-        container.style.backgroundSize = "30px 30px";
-        container.style.width = '30px';
-        container.style.height = '30px'; 
-        
-        container.onmouseover = function(){
-          container.style.backgroundColor = 'pink'; 
-        }
-        container.onmouseout = function(){
-          container.style.backgroundColor = 'white'; 
-        } */
-    
-        container.onclick = function() {
-            stats();
-        };
-    
-        container.innerHTML = `
-        <div class=\"geocoder-control-input leaflet-bar\" title=\"Stats\" style=\"    
-
-        background-image: url(); width:35px; \"><img src="https://smartcity.tacc.utexas.edu/FireIncident/assets/images/stats1.png" style="width: 20px;height: 20px;position: absolute;left: 5px;"></div><div class=\"geocoder-control-suggestions leaflet-bar\"><div class=\"\"></div></div>\r\n
-        `;
-
-        return container;
-      },
-
-    onRemove: function(map) {
-        // Nothing to do here
-    }
-});
-
-/*
-L.control.watermark = function(opts) {
-    return new L.Control.Watermark(opts);
-}
-
-
-L.control.watermark({ position: 'bottomright' }).addTo(map);
-*/
 //document.getElementsByClassName("geocoder-control")[0].style = "position:fixed;width: 10px;top: 2.5px;right: 29.5px;"
 
 
