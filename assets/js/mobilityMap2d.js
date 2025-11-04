@@ -1848,11 +1848,16 @@ function new_archived_incident_cluster_layer() {
             transitLocations[i].remove();
         }
         if (!document.querySelector(".transit").checked) {
+            // Hide loading overlay when checkbox is unchecked
+            hideLoadingOverlay();
             return
         }
         let transit = document.querySelector(".transit").checked;
         // mobility JSON data
         if (transit) {
+            // Show loading overlay
+            showLoadingOverlay('Loading transit location data...');
+            
             transit_markers = new_transit_cluster_layer();
             // Try direct fetch first, then fallback to CORS proxy if needed
             const transitUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json';
@@ -1886,6 +1891,9 @@ function new_archived_incident_cluster_layer() {
                 .then(transit_json => {
                     console.log(transit_json);
                     
+                    // Hide loading overlay
+                    hideLoadingOverlay();
+                    
                     if (!transit_json || !transit_json["entity"]) {
                         console.error('Invalid transit data format');
                         return;
@@ -1917,6 +1925,8 @@ function new_archived_incident_cluster_layer() {
                 })
                 .catch(error => {
                     console.error('Error fetching transit data:', error);
+                    // Hide loading overlay on error
+                    hideLoadingOverlay();
                     alert('Failed to load transit location data. This may be due to CORS restrictions. Please contact the administrator.');
                 });
         }
@@ -1929,6 +1939,8 @@ function new_archived_incident_cluster_layer() {
             scooterLocations[i].remove();
         }
         if (!document.querySelector(".micromobility").checked) {
+            // Hide loading overlay when checkbox is unchecked
+            hideLoadingOverlay();
             return
         }
 
@@ -1936,6 +1948,9 @@ function new_archived_incident_cluster_layer() {
 
         // mobility JSON data
         if (micromobility) {
+            // Show loading overlay
+            showLoadingOverlay('Loading micromobility location data...');
+            
             scooter_markers = new_scooter_cluster_layer();
             // Try direct fetch first, then fallback to CORS proxy if needed
             const scooterUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/freebike.json';
@@ -1969,6 +1984,9 @@ function new_archived_incident_cluster_layer() {
                 .then(scooter_json => {
                     console.log(scooter_json);
                     
+                    // Hide loading overlay
+                    hideLoadingOverlay();
+                    
                     if (!scooter_json || !scooter_json["data"] || !scooter_json["data"]["bikes"]) {
                         console.error('Invalid scooter data format');
                         return;
@@ -1996,12 +2014,88 @@ function new_archived_incident_cluster_layer() {
                 })
                 .catch(error => {
                     console.error('Error fetching scooter data:', error);
+                    // Hide loading overlay on error
+                    hideLoadingOverlay();
                     alert('Failed to load micromobility location data. This may be due to CORS restrictions. Please contact the administrator.');
                 });
         }
     }
 
     let incident_markers = []
+    
+    // Generic loading overlay functions
+    function showLoadingOverlay(loadingText = 'Loading...') {
+        const loadingOverlay = document.getElementById('data-loading-overlay');
+        const progressBar = document.getElementById('loading-progress-bar');
+        const percentageText = document.getElementById('loading-percentage');
+        const textElement = document.getElementById('loading-text');
+        
+        if (loadingOverlay) {
+            // Set loading text
+            if (textElement) {
+                textElement.textContent = loadingText;
+            }
+            
+            loadingOverlay.style.display = 'flex';
+            if (progressBar) {
+                progressBar.style.width = '0%';
+            }
+            if (percentageText) {
+                percentageText.textContent = '0%';
+            }
+            
+            // Simulate progress animation
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90; // Don't complete until actual data loads
+                if (progressBar) {
+                    progressBar.style.width = progress + '%';
+                }
+                if (percentageText) {
+                    percentageText.textContent = Math.floor(progress) + '%';
+                }
+            }, 200);
+            
+            // Store interval ID for cleanup
+            loadingOverlay.dataset.progressInterval = progressInterval;
+        }
+    }
+    
+    function hideLoadingOverlay() {
+        const loadingOverlay = document.getElementById('data-loading-overlay');
+        const progressBar = document.getElementById('loading-progress-bar');
+        const percentageText = document.getElementById('loading-percentage');
+        
+        if (loadingOverlay) {
+            // Complete the progress bar
+            if (progressBar) {
+                progressBar.style.width = '100%';
+                progressBar.style.animation = 'none';
+            }
+            if (percentageText) {
+                percentageText.textContent = '100%';
+            }
+            
+            // Clear progress interval if exists
+            if (loadingOverlay.dataset.progressInterval) {
+                clearInterval(parseInt(loadingOverlay.dataset.progressInterval));
+            }
+            
+            // Hide after a short delay to show completion
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+                if (progressBar) {
+                    progressBar.style.width = '0%';
+                    progressBar.style.animation = 'progress-animation 2s ease-in-out infinite';
+                }
+                if (percentageText) {
+                    percentageText.textContent = '0%';
+                }
+            }, 300);
+        }
+    }
+
     function buildLiveIncidentMap() {
         // Delete all markers
         for (var i = 0; i < incident_markers.length; i++) {
@@ -2010,6 +2104,10 @@ function new_archived_incident_cluster_layer() {
         let incident = document.querySelector(".active_incident").checked;
         if (incident) {
             console.log("Active Incident checked")
+            
+            // Show loading overlay
+            showLoadingOverlay('Loading traffic incident data...');
+            
             // Try direct fetch first, then fallback to CORS proxy if needed
             const incidentUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/incident_active.json';
             const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(incidentUrl);
@@ -2042,6 +2140,9 @@ function new_archived_incident_cluster_layer() {
               .then(incident_json => {
                 console.log(incident_json);
                 
+                // Hide loading overlay
+                hideLoadingOverlay();
+                
                 if (!incident_json || !Array.isArray(incident_json)) {
                     console.error('Invalid incident data format');
                     return;
@@ -2068,8 +2169,13 @@ function new_archived_incident_cluster_layer() {
               })
               .catch(error => {
                 console.error('Error fetching incident data:', error);
+                // Hide loading overlay on error
+                hideLoadingOverlay();
                 alert('Failed to load active traffic incident data. This may be due to CORS restrictions. Please contact the administrator.');
               });
+        } else {
+            // Hide loading overlay when checkbox is unchecked
+            hideLoadingOverlay();
         }
     }
 
@@ -2078,6 +2184,8 @@ function new_archived_incident_cluster_layer() {
             incidentLocations[i].remove();
         }
         if (!document.querySelector(".archived_incident").checked) {
+            // Hide loading overlay when checkbox is unchecked
+            hideLoadingOverlay();
             return
         }
 
@@ -2085,6 +2193,9 @@ function new_archived_incident_cluster_layer() {
 
         // mobility JSON data
         if (archived_incident) {
+            // Show loading overlay
+            showLoadingOverlay('Loading archived traffic incident data...');
+            
             archived_incident_markers = new_archived_incident_cluster_layer();
             // Try direct fetch first, then fallback to CORS proxy if needed
             const archivedUrl = 'https://smartcity.tacc.utexas.edu/data/transportation/incident_archived.json';
@@ -2118,6 +2229,9 @@ function new_archived_incident_cluster_layer() {
               .then(archived_incident_json => {
                 console.log(archived_incident_json);
                 
+                // Hide loading overlay
+                hideLoadingOverlay();
+                
                 if (!archived_incident_json || !Array.isArray(archived_incident_json)) {
                     console.error('Invalid archived incident data format');
                     return;
@@ -2147,6 +2261,8 @@ function new_archived_incident_cluster_layer() {
             })
             .catch(error => {
                 console.error('Error fetching archived incident data:', error);
+                // Hide loading overlay on error
+                hideLoadingOverlay();
                 alert('Failed to load archived traffic incident data. This may be due to CORS restrictions. Please contact the administrator.');
             });
         }
