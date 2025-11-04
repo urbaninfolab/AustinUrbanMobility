@@ -566,85 +566,6 @@ function new_archived_incident_cluster_layer() {
         });*/
     }
 
-    function getToday() {
-        document.getElementById("CurrentSelectedDate").textContent = "⠀ ⠀᠎⠀ ⠀Today";
-        var datePicker = document.querySelector('.date-picker');
-        datePicker.style.display = 'none';
-                                // clear all markers and rebuild map layer
-                                /*map.eachLayer(function (layer) {
-                                    map.removeLayer(layer);
-                                });
-                                addMapLayer(map);*/
-                                // map today's fire data
-                                dateArray = [];
-                                var today = new Date();
-                                var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + today.getDate()).slice(-2);
-                                dateArray.push(date);
-                                mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                                // show status toggle button and uncheck checkbox
-                                //statusToggle.style.display = 'flex';
-                                //checkbox.checked = false;
-    }
-
-    function getYesterday() {
-        document.getElementById("CurrentSelectedDate").textContent = "⠀ ⠀᠎⠀ ⠀Yesterday";
-        var datePicker = document.querySelector('.date-picker');
-        datePicker.style.display = 'none';
-                        // clear all markers and rebuild map layer
-                        /*map.eachLayer(function (layer) {
-                            map.removeLayer(layer);
-                        });
-                        addMapLayer(map);*/
-                        // map yesterday's fire data
-                        dateArray = [];
-                        var today = new Date();
-                        var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + (today.getDate() - 1)).slice(-2);
-                        dateArray.push(date);
-                        mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        //statusToggle.style.display = 'none';
-
-                    }
-
-
-    function get3Days() {
-        document.getElementById("CurrentSelectedDate").textContent = "⠀ ⠀᠎⠀ ⠀Last 3 Days";
-        var datePicker = document.querySelector('.date-picker');
-        datePicker.style.display = 'none';
-                        // clear all markers and rebuild map layer
-                        /*map.eachLayer(function (layer) {
-                            map.removeLayer(layer);
-                        });
-                        addMapLayer(map);*/
-                        // map fire data of past 3 days 
-                        dateArray = [];
-                        var today = new Date();
-                        for (let i = 0; i < 3; i++) {
-                            var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + (today.getDate() - i)).slice(-2);
-                            dateArray.push(date);
-                        }
-                        mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        //statusToggle.style.display = 'none';
-
-    }
-
-    function getCustom() {
-        document.getElementById("CurrentSelectedDate").innerHTML = "⠀ ⠀᠎⠀ ⠀Custom";;
-
-        var datePicker = document.querySelector('.date-picker');
-        datePicker.style.display = 'none';
-        // add event listener
-        datePicker.addEventListener('change', (event) => {
-            // clear all markers and rebuild map layer
-            /*map.eachLayer(function (layer) {
-                map.removeLayer(layer);
-            });
-            addMapLayer(map);*/
-            mapFireIncident(map, [event.target.value], inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag)
-        })
-                                // show date selector
-                                datePicker.style.display = 'block';
-                                //statusToggle.style.display = 'none';
-    }
 
     function buildSelectBar(map) {
         var checkList = document.getElementById('filter-menu');
@@ -704,9 +625,6 @@ function new_archived_incident_cluster_layer() {
                         var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + today.getDate()).slice(-2);
                         dateArray.push(date);
                         mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        // show status toggle button and uncheck checkbox
-                        statusToggle.style.display = 'flex';
-                        checkbox.checked = false;
                         break;
 
                     // Yesterday Button
@@ -722,7 +640,6 @@ function new_archived_incident_cluster_layer() {
                         var date = today.getFullYear() + '-' + ("0" + (today.getMonth() + 1)).slice(-2) + '-' + ("0" + (today.getDate() - 1)).slice(-2);
                         dateArray.push(date);
                         mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        statusToggle.style.display = 'none';
                         break;
 
                     // Past 3 days Button
@@ -740,14 +657,12 @@ function new_archived_incident_cluster_layer() {
                             dateArray.push(date);
                         }
                         mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                        statusToggle.style.display = 'none';
                         break;
 
                     // Custom Button
                     case 4:
                         // show date selector
                         datePicker.style.display = 'block';
-                        statusToggle.style.display = 'none';
                         break;
                 }
             }));
@@ -1165,206 +1080,7 @@ function new_archived_incident_cluster_layer() {
     }
 
 
-    async function mapTransitData(map) {
-        // Delete all markers
-        for (let i = 0; i < transit_markers.length; i++) {
-            transit_markers[i].remove();
-        }
-        for (let i = 0; i < transitLocations.length; i++) {
-            transitLocations[i].remove();
-        }
-        if (!document.querySelector(".transit").checked) {
-            return
-        }
-        const transitUrl = "https://smartcity.tacc.utexas.edu/data/transportation/transitposition.json";
-        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(transitUrl);
-        
-        try {
-            // Try direct fetch first, then fallback to CORS proxy if needed
-            let response = await fetch(transitUrl, {
-                mode: 'cors',
-                credentials: 'omit'
-            });
-            
-            // Check response status before parsing JSON
-            if (!response.ok) {
-                throw new Error('Direct fetch failed');
-            }
-            
-            let transit_json = await response.json();
-            
-            console.log(transit_json);
-            
-            if (!transit_json || !transit_json["entity"]) {
-                console.error('Invalid transit data format');
-                return;
-            }
-            
-            for (let i = 0; i < transit_json["entity"].length; i++) {
-                if (!transit_json["entity"][i]["vehicle"] || !transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
-                    continue;
-                }
-                let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
-                let x = transit_json["entity"][i]["vehicle"]["position"]["longitude"];
-                let transit_marker = new L.marker([y,x]);
-                let iconLink = "assets/images/bus_icon.png";
-                transit_marker.setIcon(L.icon({
-                    iconUrl: iconLink,
-                    iconSize: [24, 32],
-                    iconAnchor: [12, 32],
-                    popupAnchor: [0, -30]
-                }));
-                var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
-                var vehicle_id = transit_json["entity"][i]["id"]
-                var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
-                transit_marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
 
-                transit_markers.addLayer(transit_marker)
-                transitLocations.addLayer(transit_marker)
-            }
-        } catch (error) {
-            console.log('Direct fetch failed, trying CORS proxy:', error);
-            try {
-                // Fallback to CORS proxy
-                let response = await fetch(proxyUrl, {
-                    mode: 'cors',
-                    credentials: 'omit'
-                });
-                if (!response.ok) {
-                    throw new Error('Proxy fetch failed');
-                }
-                let transit_json = await response.json();
-                console.log(transit_json);
-                
-                if (!transit_json || !transit_json["entity"]) {
-                    console.error('Invalid transit data format');
-                    return;
-                }
-                
-                for (let i = 0; i < transit_json["entity"].length; i++) {
-                    if (!transit_json["entity"][i]["vehicle"] || !transit_json["entity"][i]["vehicle"].hasOwnProperty("trip")) {
-                        continue;
-                    }
-                    let y = transit_json["entity"][i]["vehicle"]["position"]["latitude"];
-                    let x = transit_json["entity"][i]["vehicle"]["position"]["longitude"];
-                    let transit_marker = new L.marker([y,x]);
-                    let iconLink = "assets/images/bus_icon.png";
-                    transit_marker.setIcon(L.icon({
-                        iconUrl: iconLink,
-                        iconSize: [24, 32],
-                        iconAnchor: [12, 32],
-                        popupAnchor: [0, -30]
-                    }));
-                    var route_id = transit_json["entity"][i]["vehicle"]["trip"]["routeId"]
-                    var vehicle_id = transit_json["entity"][i]["id"]
-                    var speed = transit_json["entity"][i]["vehicle"]["position"]["speed"]
-                    transit_marker.bindPopup(" Vehicle ID: " + vehicle_id + ", Route: " + route_id + ", Speed: " + speed + "m/s");
-
-                    transit_markers.addLayer(transit_marker)
-                    transitLocations.addLayer(transit_marker)
-                }
-            } catch (proxyError) {
-                console.error('Error fetching transit data:', proxyError);
-                alert('Failed to load transit location data. This may be due to CORS restrictions. Please contact the administrator.');
-            }
-        }
-    }
-
-    async function mapScooterData(map) {
-        // Delete all markers
-        for (let i = 0; i < scooter_markers.length; i++) {
-            scooter_markers[i].remove();
-        }
-        for (let i = 0; i < scooterLocations.length; i++) {
-            scooterLocations[i].remove();
-        }
-        if (!document.querySelector(".micromobility").checked) {
-            return
-        }
-        const scooterUrl = "https://smartcity.tacc.utexas.edu/data/transportation/freebike.json";
-        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(scooterUrl);
-        
-        try {
-            // Try direct fetch first, then fallback to CORS proxy if needed
-            let response = await fetch(scooterUrl, {
-                mode: 'cors',
-                credentials: 'omit'
-            });
-            
-            // Check response status before parsing JSON
-            if (!response.ok) {
-                throw new Error('Direct fetch failed');
-            }
-            
-            let scooter_json = await response.json();
-            console.log(scooter_json);
-            
-            if (!scooter_json || !scooter_json["data"] || !scooter_json["data"]["bikes"]) {
-                console.error('Invalid scooter data format');
-                return;
-            }
-            
-            for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
-                let y = scooter_json["data"]["bikes"][i]["lat"];
-                let x = scooter_json["data"]["bikes"][i]["lon"];
-                let scooter_marker = new L.marker([y,x]);
-                let iconLink = "assets/images/scooter_icon.png";
-                scooter_marker.setIcon(L.icon({
-                    iconUrl: iconLink,
-                    iconSize: [24, 32],
-                    iconAnchor: [12, 32],
-                    popupAnchor: [0, -30]
-                }));
-                var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
-                var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
-                scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
-
-                scooter_markers.addLayer(scooter_marker)
-                scooterLocations.addLayer(scooter_marker)
-            }
-        } catch (error) {
-            console.log('Direct fetch failed, trying CORS proxy:', error);
-            try {
-                // Fallback to CORS proxy
-                let response = await fetch(proxyUrl, {
-                    mode: 'cors',
-                    credentials: 'omit'
-                });
-                if (!response.ok) {
-                    throw new Error('Proxy fetch failed');
-                }
-                let scooter_json = await response.json();
-                console.log(scooter_json);
-                
-                if (!scooter_json || !scooter_json["data"] || !scooter_json["data"]["bikes"]) {
-                    console.error('Invalid scooter data format');
-                    return;
-                }
-                
-                for (let i = 0; i < scooter_json["data"]["bikes"].length; i++) {
-                    let y = scooter_json["data"]["bikes"][i]["lat"];
-                    let x = scooter_json["data"]["bikes"][i]["lon"];
-                    let scooter_marker = new L.marker([y,x]);
-                    let iconLink = "assets/images/scooter_icon.png";
-                    scooter_marker.setIcon(L.icon({
-                        iconUrl: iconLink,
-                        iconSize: [24, 32],
-                        iconAnchor: [12, 32],
-                        popupAnchor: [0, -30]
-                    }));
-                    var bike_id = scooter_json["data"]["bikes"][i]["bike_id"]
-                    var bike_type = scooter_json["data"]["bikes"][i]["vehicle_type_id"]
-                    scooter_marker.bindPopup(" ID: " + bike_id + ", Type: " + bike_type);
-
-                    scooter_markers.addLayer(scooter_marker)
-                    scooterLocations.addLayer(scooter_marker)
-                }
-            } catch (proxyError) {
-                console.error('Error fetching scooter data:', proxyError);
-                alert('Failed to load micromobility location data. This may be due to CORS restrictions. Please contact the administrator.');
-            }
-        }
-    }
 
 
     function addMore() {
@@ -2873,34 +2589,6 @@ function new_archived_incident_cluster_layer() {
         });
     }
 
-    function addShapefileRadioListener(map) {
-        var radios = document.getElementsByName('shapefile-radio');
-        for (var i = 0, max = radios.length; i < max; i++) {
-            radios[i].onclick = function () {
-                shapefile_display_flag = this.value;
-                // console.log(shapefile_display_flag)
-                // clear all markers and rebuild map layer
-                /*map.eachLayer(function (layer) {
-                    map.removeLayer(layer);
-                });
-                addMapLayer(map);
-                mapFireIncident(map, dateArray, inactive_flag, shapefile_display_flag, purple_air_diaplay_flag, microsoft_air_display_flag);
-                */
-               if(currentShapefile != null) 
-                    map.removeLayer(currentShapefile)
-                buildShapefile(map, shapefile_display_flag)
-
-                var checkboxOneSmoke = document.querySelector(".one-hour-smoke");
-                var checkboxTwoSmoke = document.querySelector(".two-hour-smoke");
-                var checkboxThreeSmoke = document.querySelector(".three-hour-smoke");
-                checkboxOneSmoke.checked = false;
-                checkboxOneSmoke.checked = true;
-                checkboxOneSmoke.dispatchEvent(new Event('click'));
-                checkboxTwoSmoke.checked = false;
-                checkboxThreeSmoke.checked = false;
-            }
-        }
-    }
 
 
     var data = "<item><title>Traffic Injury Pri 4F</title>" +
