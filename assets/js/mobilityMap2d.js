@@ -232,15 +232,6 @@ function new_archived_incident_cluster_layer() {
             mapMicrosoftAirData(map);
         }
 
-        // hide air quality legend
-        var airQualityLegend = document.querySelector('.air-quality-legend');
-        if (!purple_air_diaplay_flag && !microsoft_air_display_flag) {
-            airQualityLegend.style.display = 'none';
-        } else {
-            //airQualityLegend.style.display = 'flex';
-
-        }
-
     }
 
     function processData(data) {
@@ -804,9 +795,6 @@ function new_archived_incident_cluster_layer() {
         let shapefileName = "";
         let popupContent = ``;
         let shapefile = "";
-        var fireRiskLegend = document.querySelector('.fire-risk-legend');
-        var afdLegend = document.querySelector('.afd-legend');
-        var hviLegend = document.querySelector('.hvi-legend');
 
         switch (shapefile_display_flag) {
             case 'fire-risk-radio':
@@ -860,11 +848,6 @@ function new_archived_incident_cluster_layer() {
                     
                     
                 })
-                // hide fire risk legend
-                document.getElementById('fireRiskType').innerHTML = "Fire Vulnerability Risk: "
-                fireRiskLegend.style.display = 'flex';
-                afdLegend.style.display = 'none';
-                hviLegend.style.display = 'none';
                 shpfile.addTo(map);
                 currentShapefile = shpfile;
                 break;
@@ -906,9 +889,6 @@ function new_archived_incident_cluster_layer() {
                         // }
                     }
                 })
-                afdLegend.style.display = 'flex';
-                fireRiskLegend.style.display = 'none';
-                hviLegend.style.display = 'none';
                 shpfile.addTo(map);
                 currentShapefile = shpfile;
                 break;
@@ -944,11 +924,6 @@ function new_archived_incident_cluster_layer() {
                     }
                 })
                 // color by exposure, color map by 5 colors
-
-
-                hviLegend.style.display = 'flex';
-                afdLegend.style.display = 'none';
-                fireRiskLegend.style.display = 'none';
                 shpfile.addTo(map);
                 currentShapefile = shpfile;
                 break;
@@ -1060,11 +1035,6 @@ function new_archived_incident_cluster_layer() {
                     shpfile = cachedShapefile;
                 }
            
-                // hide fire risk legend
-                document.getElementById('fireRiskType').innerHTML = "Urban Fire Risk: "
-                fireRiskLegend.style.display = 'flex';
-                afdLegend.style.display = 'none';
-                hviLegend.style.display = 'none';
                 shpfile.addTo(map);
                 cachedShapefile = shpfile;
                 currentShapefile = shpfile;
@@ -1072,12 +1042,7 @@ function new_archived_incident_cluster_layer() {
 
 
             case 'none-radio':
-                //fireRiskLegend.style.display = 'none';
-                //afdLegend.style.display = 'none';
                 currentShapefile = null;
-                fireRiskLegend.style.display = 'none';
-                afdLegend.style.display = 'none';
-                hviLegend.style.display = 'none';
                 break;
 
         }
@@ -2966,11 +2931,6 @@ function new_archived_incident_cluster_layer() {
     buildSelectBar(map);
     buildDropdownMenu(map);
     map._layersMaxZoom = 19;
-
-    document.querySelector('.afd-legend').style.display = 'none';
-    document.querySelector('.air-quality-legend').style.display = 'none';
-    document.querySelector('.fire-risk-legend').style.display = 'none';
-    document.querySelector('.hvi-legend').style.display = 'none';
 
 
 

@@ -336,12 +336,6 @@ Check My Location button code leaflet
 				<h2 id="MapTitle" style="float: left; margin-right: 1rem; margin-top:5px; color: white;"><b><a
 							style="color:white" href="#">Austin Mobility Map</a></b></h2>
 			</div>
-			<!--
-                                <div id="get-help">
-                                        <p><a onclick="stats()" href="#">View Stats</a></p>
-                                        <p><a onclick="info()" href="#">More Information</a></p>
-                                </div>
-								-->
 
 
 
@@ -468,28 +462,6 @@ Check My Location button code leaflet
 
 					</ul>
 				</div>
-
-				<!-- <div id="filter-menu2" class="dropdown-check-list2" tabindex="100"
-					style="position:relative; margin-top: 17px; margin-left: 15px;">
-					<a onclick="stats()" href="#">
-						<img src="https://smartcity.tacc.utexas.edu/FireIncident/assets/images/stats.png" width="25px"
-							height="25px" xml:space="preserve"> </img>
-					</a>
-				</div> -->
-
-				<!-- <div class="dropdown">
-					<div id="filter-menu1" class="dropdown-check-list1" tabindex="100">
-						<span id="CurrentSelectedDate" class="anchor" type="button" data-toggle="dropdown"
-							style="user-select: none">Today</span>
-
-						<ul class="dropdown-menu" style=" user-select: none">
-							<li><a onclick="getToday()" href="#" class="option">Today</a></li>
-							<li><a onclick="getYesterday()" href="#" class="option">Yesterday</a></li>
-							<li><a onclick="get3Days()" href="#" class="option">Past 3 Days</a></li>
-							<li><a onclick="getCustom()" href="#" class="option">Custom</a></li>
-						</ul>
-					</div>
-				</div> -->
 			</div>
 
 
@@ -506,161 +478,10 @@ Check My Location button code leaflet
 		</div>
 	</section>
 
-	<div class="legend-wrapper">
-		<div class="air-quality-legend" style="margin-top: -50px;">
-			<div style="background-color: white;">
-				<span>Air Quality: </span>
-			</div>
-			<div style="background-color: #9cd74e;">
-				<span>0</span>
-			</div>
-			<div style="background-color: #facf39;">
-				<span>50</span>
-			</div>
-			<div style="background-color: #f68f47;">
-				<span>100</span>
-			</div>
-			<div style="background-color: #f55e5f;">
-				<span style="color:#ffffff">150</span>
-			</div>
-			<div style="background-color: #a070b5;">
-				<span style="color:#ffffff">200</span>
-			</div>
-			<div style="background-color: #a06a7b;">
-				<span style="color:#ffffff">300</span>
-			</div>
-		</div>
-	</div>
-	<div class="legend-wrapper">
-		<div class="air-quality-legend" style="margin-top: -30px;">
-			<div style="background-color: white; width:325px">
-				<!-- Get current date -->
-				<span id="date"></span>
-			</div>
-		</div>
-	</div>
 	</div>
 
-	<script>
-		// Put the date in the legend, as Month Name Day, Year, Time
-		var d = new Date();
-		var month = d.getMonth() + 1;
-		// Convert month number to month name
-		var monthName = new Array();
-		monthNames = ["January", "February", "March", "April", "May", "June",
-			"July", "August", "September", "October", "November", "December"
-		];
-		monthName = monthNames[month - 1];
-		var day = d.getDate();
-		var year = d.getFullYear();
-		var hour = d.getHours();
-		var minute = d.getMinutes();
-		var second = d.getSeconds();
-		var ampm = hour >= 12 ? 'PM' : 'AM';
-		hour = hour % 12;
-		hour = hour ? hour : 12; // the hour '0' should be '12'
-		minute = minute < 10 ? '0' + minute : minute;
-		second = second < 10 ? '0' + second : second;
-		var strTime = hour + ':' + minute + ':' + second + ' ' + ampm;
-		// Get Time Zone Acronym
-		var timeZone = d.toLocaleDateString('en-US', { day: '2-digit', timeZoneName: 'short', }).slice(4);
-
-		document.getElementById("date").innerHTML = monthName + " " + day + ", " + year + ", " + strTime + " " + timeZone;
-
-		// Make the legend update every second
-		setInterval(function () {
-			var d = new Date();
-			var month = d.getMonth() + 1;
-			// Convert month number to month name
-			var monthName = new Array();
-			monthNames = ["January", "February", "March", "April", "May", "June",
-				"July", "August", "September", "October", "November", "December"
-			];
-			monthName = monthNames[month - 1];
-			var day = d.getDate();
-			var year = d.getFullYear();
-			var hour = d.getHours();
-			var minute = d.getMinutes();
-			var second = d.getSeconds();
-			var ampm = hour >= 12 ? 'PM' : 'AM';
-			hour = hour % 12;
-			hour = hour ? hour : 12; // the hour '0' should be '12'
-			minute = minute < 10 ? '0' + minute : minute;
-			second = second < 10 ? '0' + second : second;
-			var strTime = hour + ':' + minute + ':' + second + ' ' + ampm;
-			// Get Time Zone Acronym
-			var timeZone = d.toLocaleDateString('en-US', { day: '2-digit', timeZoneName: 'short', }).slice(4);
-
-			document.getElementById("date").innerHTML = monthName + " " + day + ", " + year + ", " + strTime + " " + timeZone;
-		}, 60000);
 
 
-
-
-	</script>
-
-
-
-	<div class="legend-wrapper">
-		<div class="fire-risk-legend">
-			<div style="background-color: white;">
-				<span id="fireRiskType">Fire Risk: </span>
-			</div>
-			<div style="background-color: red;">
-				<span style="color:#ffffff">Highest</span>
-			</div>
-			<div style="background-color: orange;">
-				<span>Elevated</span>
-			</div>
-			<div style="background-color: yellow;">
-				<span>Normal</span>
-			</div>
-		</div>
-	</div>
-	<div class="legend-wrapper">
-		<div class="afd-legend">
-			<div style="background-color: white;">
-				<span>AFD Response Rate: </span>
-			</div>
-			<div style="background-color: rgb(1, 106, 1);">
-				<span style="color:#ffffff">90% and up</span>
-			</div>
-			<div style="background-color: #699d50;">
-				<span style="color:#ffffff">80% ~ 89%</span>
-			</div>
-			<div style="background-color: orange;">
-				<span style="color:#ffffff">70% ~ 79%</span>
-			</div>
-			<div style="background-color: #ff5500;">
-				<span style="color:#ffffff">50% ~ 67%</span>
-			</div>
-			<div style="background-color: #704489;">
-				<span style="color:#ffffff">Less than 50%</span>
-			</div>
-		</div>
-	</div>
-	<div class="legend-wrapper">
-		<div class="hvi-legend">
-			<div style="background-color: white;">
-				<span>AFD Response Rate: </span>
-			</div>
-			<div style="background-color: rgb(1, 106, 1);">
-				<span>90% and up</span>
-			</div>
-			<div style="background-color: #699d50;">
-				<span>80% ~ 89%</span>
-			</div>
-			<div style="background-color: orange;">
-				<span>60% ~ 79%</span>
-			</div>
-			<div style="background-color: #ff5500;">
-				<span>40% ~ 59%</span>
-			</div>
-			<div style="background-color: #704489;">
-				<span>Less than 40%</span>
-			</div>
-		</div>
-	</div>
 
 	</div>
 
