@@ -412,7 +412,13 @@ Check My Location button code leaflet
 	</div>
 
 	<link rel="stylesheet" href="assets/css/fireMap.css" />
-	<script src="assets/js/mobilityMap2d.js"></script>
+	<!-- Refactored script files - load in order -->
+	<!-- 1. Common map functionality -->
+	<script src="assets/js/map_common.js"></script>
+	<!-- 2. Project-specific functionality -->
+	<script src="assets/js/mobility_map.js"></script>
+	<!-- 3. Initialization script -->
+	<script src="assets/js/map_init.js"></script>
 
 	<!-- Google Map Layers -->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0IIh7KXVmItoyyPktQpcgAzmbflbWR4s" async
